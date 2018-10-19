@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var user_domain = require('../domains/users');
+var user_domain = require('../controllers/users');
 
 const { check, validationResult } = require('express-validator/check');
 

@@ -3,9 +3,9 @@
 const models = require('../models');
 
 exports.get_by_id = function (params) {
-    return {test: 'OK'}
+    return {test: 'OK ID'}
 }
 
 exports.get_all = function (params) {
-    return {test: 'OK'}
+    return {test: 'OK ALL'}
 }
