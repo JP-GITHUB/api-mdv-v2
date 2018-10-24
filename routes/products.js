@@ -5,7 +5,7 @@ var router = express.Router();
 var middle_auth = require('../middlewares/auth');
 var product_ctr = require('../controllers/products');
 
-router.get('/', async function (req, res, next) {
+router.get('/', middle_auth.validate,  async function (req, res, next) {
     res.json(await product_ctr.get_all());
 });
 
