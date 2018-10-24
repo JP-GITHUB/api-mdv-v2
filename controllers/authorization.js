@@ -3,16 +3,16 @@
 var jwt = require('jsonwebtoken');
 const models = require('../models');
 
-exports.login = async function (email, password) {
-    let user = await models.USUARIO.findOne({
-        attributes: ['id', 'nombre', 'apellido', 'rut', 'mail', 'estado'],
+exports.login = async function(mail, password) {
+    let user = await models.User.findOne({
+        attributes: ['id', 'name', 'lastname', 'rut', 'mail', 'status'],
         where: {
-            mail: email,
+            mail: mail,
             password: password
         },
         include: [{
-            model: models.PERFIL,
-            attributes: ['id', 'nombre']
+            model: models.Profile,
+            attributes: ['id', 'name']
         }]
     });
 
@@ -25,7 +25,7 @@ exports.login = async function (email, password) {
     }
 
     var tokenData = {
-        email: email,
+        mail: mail,
         user: user
     }
 
