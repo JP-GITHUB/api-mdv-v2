@@ -1,6 +1,6 @@
 'use strict'
 
-const models = require('../models');
+const models = require('../models'); 
 
 exports.register = async function (data) {
     let user_data = {
