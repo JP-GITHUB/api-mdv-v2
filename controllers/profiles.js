@@ -4,13 +4,13 @@ var jwt = require('jsonwebtoken');
 const models = require('../models');
 
 exports.get_all = async function () {
-    let perfiles = await models.PERFIL.findAll();
-    return { data: perfiles };
+    let Profiles = await models.Profile.findAll();
+    return { data: Profiles };
 }
 
 exports.update = function (profile_id, name) {
-    models.PERFIL.update(
-        { nombre: name }, {
+    models.Profile.update(
+        { name: name }, {
             where: {
                 id: profile_id
             }
@@ -25,10 +25,10 @@ exports.update = function (profile_id, name) {
 }
 
 exports.new = async function (name) {
-    models.PERFIL.create(
+    models.Profile.create(
         {
-            nombre: name,
-            estado: true
+            name: name,
+            status: true
         }
     )
         .then(function (rowCreated) {
@@ -40,8 +40,8 @@ exports.new = async function (name) {
 }
 
 exports.delete = async function (profile_id) {
-    models.PERFIL.update(
-        { estado: 0 }, {
+    models.Profile.update(
+        { status: 0 }, {
             where: {
                 id: profile_id
             }
