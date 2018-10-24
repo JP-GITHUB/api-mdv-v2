@@ -4,10 +4,10 @@ var jwt = require('jsonwebtoken');
 const models = require('../models');
 
 exports.get_all = async function () {
-    let productos = await models.PRODUCTO.findAll();
+    let product = await models.Product.findAll();
 
-    //mientras no filtro por el estado del producto pues asumo que mejor traer todo y filtrar en la vista
-    if (productos === null) {
+    //mientras no filtro por el status del Product pues asumo que mejor traer todo y filtrar en la vista
+    if (product === null) {
         return {
             status: false,
             msg: 'no hay productos para mostrar'
@@ -16,17 +16,16 @@ exports.get_all = async function () {
 
     return {
         status: true,
-        obj: productos
+        obj: product
     };
 }
 
 exports.update = function (data) {
-    models.PRODUCTO.update(
+    models.Product.update(
         {
-            nombre: data.nombre,
-            descripcion: req.bode.descripcion,
-            talla: data.talla,
-            precio: data.precio,
+            name: data.name,
+            description: req.bode.description,
+            price: data.price,
         }, {
             where: {
                 id: data.id
@@ -42,9 +41,9 @@ exports.update = function (data) {
 }
 
 exports.update_quantity = async function (data) {
-    models.PRODUCTO.update(
+    models.Product.update(
         {
-            cantidad: data.cantidad
+            quantity: data.quantity
         }, {
             where: {
                 id: data.id
@@ -60,14 +59,13 @@ exports.update_quantity = async function (data) {
 }
 
 exports.new = async function (data) {
-    models.PRODUCTO.create(
+    models.Product.create(
         {
-            nombre: data.nombre,
-            descripcion: req.bode.descripcion,
-            talla: data.talla,
-            precio: data.precio,
-            cantidad: 0,
-            estado: true
+            name: data.name,
+            description: req.bode.description,
+            price: data.price,
+            quantity: 0,
+            status: true
         }
     )
         .then(function (rowCreated) {
@@ -79,8 +77,8 @@ exports.new = async function (data) {
 }
 
 exports.delete = async function (product_id) {
-    models.PRODUCTO.update(
-        { estado: 0 }, {
+    models.Product.update(
+        { status: 0 }, {
             where: {
                 id: product_id
             }

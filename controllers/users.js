@@ -4,29 +4,17 @@ const models = require('../models');
 
 exports.register = async function (data) {
     let user_data = {
-        nombre: data.nombre,
-        apellido: data.apellido,
+        name: data.name,
+        lastname: data.lastname,
         rut: data.run,
         mail: data.mail,
-        telefono: data.telefono,
+        telephone: data.telephone,
         password: data.password,
-        estado: true,
+        status: true,
         perfil_id: 3
     };
 
-    if (user_data.nombre == "" || user_data.apellido == "" || user_data.rut == "" || user_data.mail == "" || user_data.telefono == "" || user_data.password == "") {
-        return {
-            status: false
-        };
-    };
-
-    if (user_data.password != data.rptpassword) {
-        return {
-            status: false
-        };
-    };
-
-    models.USUARIO
+    models.User
         .findOrCreate({
             where: {
                 mail: user_data.mail,
@@ -38,9 +26,9 @@ exports.register = async function (data) {
         })
         .spread((user, created) => {
             if (created == true) {
-                return { status: true, msg: "Usuario creado exitosamente" };
+                return { status: true, msg: "User creado exitosamente" };
             } else {
-                return { status: false, msg: "Usuario ya existe en nuestros registros" };
+                return { status: false, msg: "User ya existe en nuestros registros" };
             }
         });
 }
@@ -54,7 +42,7 @@ exports.change_password = async function (data) {
     if (new_pass !== new_pass_confirm) {
         return { status: false, msg: 'No coinciden las contraseñas' };
     } else {
-        models.USUARIO.update({
+        models.User.update({
             password: new_pass
         }, {
                 where: {
@@ -87,7 +75,7 @@ exports.forgot_password = async function (email) {
 
     let response = sgMail.send(msg);
     response.then(result => {
-        models.USUARIO.update({
+        models.User.update({
             password: tmp_pass
         }, {
                 where: {
@@ -110,18 +98,32 @@ exports.forgot_password = async function (email) {
     });
 }
 
+exports.get_all_dt = async function () {
+    let users = await models.User.findAll({
+        attributes: ['id', 'name', 'lastname'],
+        raw: true
+    });
+
+    return {
+        data: users,
+        draw: 0,
+        recordsFiltered: 3,
+        recordsTotal: 3
+    };
+}
+
 exports.get_all = async function () {
-    let usuarios = await models.USUARIO.findAll();
-    return { data: usuarios };
+    let users = await models.User.findAll();
+    return users;
 }
 
 exports.update = async function (data) {
-    models.USUARIO.update({
-        nombre: data.nombre,
-        apellido: data.apellido,
+    models.User.update({
+        name: data.name,
+        lastname: data.lastname,
         rut: data.rut,
         mail: data.mail,
-        telefono: data.telefono,
+        telephone: data.telephone,
         password: data.password,
         perfil_id: data.perfil
     }, {
@@ -137,7 +139,7 @@ exports.update = async function (data) {
 }
 
 exports.delete = async function (user_id) {
-    models.USUARIO.update({
+    models.User.update({
         estado: 0
     },
         {
