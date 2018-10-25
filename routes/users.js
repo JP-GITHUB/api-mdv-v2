@@ -67,14 +67,7 @@ router.post('/forgot_password', [
 });
 
 //Cambiar contraseña. CONFIRMAR 
-router.post('/change_password', middle_auth.validate
-[
-   check(middle_auth).isEmpty()
-], async function (req, res) {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()){
-        return res.status(422).json({ errors: errors.array() });
-    }
+router.post('/change_password', middle_auth.validate, async function (req, res) {
     let data = req.body;
     res.json(await user_ctr.change_password(data));
 });
