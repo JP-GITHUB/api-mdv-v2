@@ -12,7 +12,7 @@ exports.get_all = async function () {
         }
     )
 
-    if (schools === null) {
+    if (schools === null || schools.length == 0) {
         return {
             status: false,
             msg: 'No hay colegios que mostrar'
