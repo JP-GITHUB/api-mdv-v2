@@ -4,13 +4,19 @@ var jwt = require('jsonwebtoken');
 const models = require('../models');
 
 exports.get_all = async function () {
-    let product = await models.Product.findAll();
+    let product = await models.Product.findAll(
+        {
+            where:
+            {
+                status: true,
+            }
+        }
+    )
 
-    //mientras no filtro por el status del Product pues asumo que mejor traer todo y filtrar en la vista
-    if (product === null) {
+    if (product === null || product.length == 0) {
         return {
             status: false,
-            msg: 'no hay productos para mostrar'
+            msg: 'No hay productos para mostrar'
         };
     }
 
