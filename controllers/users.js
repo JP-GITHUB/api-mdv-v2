@@ -1,21 +1,21 @@
 'use strict'
 
-const models = require('../models'); 
+const models = require('../models');
 
 exports.register = async function (data) {
     let user_data = {
         name: data.name,
         lastname: data.lastname,
-        rut: data.run,
+        rut: data.rut,
         mail: data.mail,
         telephone: data.telephone,
         password: data.password,
         status: true,
-        perfil_id: 3
+        perfil_id: 3    //perfil id de cliente por defecto
     };
 
-    models.User
-        .findOrCreate({
+    return new Promise((resolve, reject) => {
+        models.User.findOrCreate({
             where: {
                 mail: user_data.mail,
                 $or: [
@@ -23,14 +23,14 @@ exports.register = async function (data) {
                 ]
             },
             defaults: user_data
-        })
-        .spread((user, created) => {
+        }).spread((user, created) => {
             if (created == true) {
-                return { status: true, msg: "User creado exitosamente" };
+                resolve({ status: true, msg: "User creado exitosamente" });
             } else {
-                return { status: false, msg: "User ya existe en nuestros registros" };
+                resolve({ status: false, msg: "User ya existe en nuestros registros" });
             }
         });
+    });
 }
 
 exports.change_password = async function (data) {
