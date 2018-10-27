@@ -39,12 +39,12 @@ router.delete('/', middle_auth.validate, async function (req, res, next) {
 
 //Registro
 router.post('/register', [
-    check('name').isEmpty().isLength({ min: 3 }),
-    check('mail').isEmail().isEmpty(),
-    check('lastname').isEmpty().isLength({ min: 3}),
-    check('rut').isEmpty(),
-    check('telephone').isEmpty().isLength({ max: 12}),
-    check('password').isEmpty().isLength({ min: 4})
+    check('name').not().isEmpty().isLength({ min: 3 }),
+    check('mail').not().isEmpty().isEmail(),
+    check('lastname').not().isEmpty().isLength({ min: 3 }),
+    check('rut').not().isEmpty(),
+    check('telephone').not().isEmpty().isLength({ max: 12 }),
+    check('password').not().isEmpty().isLength({ min: 4 })
 ], async function (req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -56,7 +56,7 @@ router.post('/register', [
 
 //Recuperar contraseña
 router.post('/forgot_password', [
-    check('mail').isEmail().isEmpty()
+    check('mail').not().isEmpty().isEmail()
 ], async function (req, res) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
