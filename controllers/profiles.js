@@ -8,6 +8,39 @@ exports.get_all = async function () {
     return { data: Profiles };
 }
 
+
+exports.new = function (name) {
+
+    return new Promise((resolve, reject) => {
+        models.Profile.findOrCreate({
+            where: {
+                name: name,
+                status: true
+            },
+            defaults: name
+        }).spread((name, created) => {
+            if (created == true) {
+                resolve({ status: true, msg: "El perfil ha sido creado." });
+            } else {
+                resolve({ status: false, msg: "Perfil ya existe" });
+            }
+        });
+    });
+}
+
+
+//     if (result) {
+//         return { status: true, msg: "El perfil ha sido creado." };
+
+//     } else {
+//         return { status: false, msg: "No ha sido posible crear el perfil." }
+//     }
+// } catch (error) {
+//     console.log(error)
+//     return { msg: "Error" }
+// }
+
+
 exports.update = function (profile_id, name) {
     models.Profile.update(
         { name: name }, {
@@ -18,21 +51,6 @@ exports.update = function (profile_id, name) {
     )
         .then(function (rowsUpdated) {
             return rowsUpdated;
-        })
-        .catch(next)
-
-    return {};
-}
-
-exports.new = async function (name) {
-    models.Profile.create(
-        {
-            name: name,
-            status: true
-        }
-    )
-        .then(function (rowCreated) {
-            return rowCreated;
         })
         .catch(next)
 
