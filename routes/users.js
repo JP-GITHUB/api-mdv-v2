@@ -53,7 +53,7 @@ router.post('/forgot_password', [
     res.json(await user_ctr.forgot_password(req.body.email));
 });
 
-//Cambiar contraseña. CONFIRMAR 
+//Cambiar contraseña.
 router.post('/change_password', middle_auth.validate, async function (req, res) {
     let data = req.body;
     res.json(await user_ctr.change_password(data));

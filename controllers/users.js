@@ -2,6 +2,7 @@
 
 const models = require('../models');
 
+//Registrar usuario
 exports.register = async function (data, profile_id = 3) {
     let user_data = {
         name: data.name,
@@ -25,14 +26,15 @@ exports.register = async function (data, profile_id = 3) {
             defaults: user_data
         }).spread((user, created) => {
             if (created == true) {
-                resolve({ status: true, msg: "User creado exitosamente" });
+                resolve({ status: true, msg: "User creado exitosamente." });
             } else {
-                resolve({ status: false, msg: "User ya existe en nuestros registros" });
+                resolve({ status: false, msg: "User ya existe en nuestros registros." });
             }
         });
     });
 }
 
+//Cambiar contraseña
 exports.change_password = async function (data) {
     let mail = data.mail;
     let old_pass = data.old_pass;
@@ -59,6 +61,7 @@ exports.change_password = async function (data) {
     }
 }
 
+//Recuperar contraseña
 exports.forgot_password = async function (email) {
     const sgMail = require('@sendgrid/mail');
     const random_hash = require('random-hash');
@@ -98,6 +101,7 @@ exports.forgot_password = async function (email) {
     });
 }
 
+
 exports.get_all_dt = async function () {
     let users = await models.User.findAll({
         attributes: ['id', 'name', 'lastname'],
@@ -117,11 +121,13 @@ exports.get_all_dt = async function () {
     };
 }
 
+//Listar todos los usuarios.
 exports.get_all = async function () {
     let users = await models.User.findAll();
     return users;
 }
 
+//Actualizar usuario.
 exports.update = async function (data) {
     return new Promise((resolve, reject) => {
         models.User.update({
@@ -145,6 +151,7 @@ exports.update = async function (data) {
     });
 }
 
+//Eliminar usuario.
 exports.delete = async function (user_id) {
     console.log(user_id)
     return new Promise((resolve, reject) => {

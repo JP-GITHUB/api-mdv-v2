@@ -3,12 +3,13 @@
 var jwt = require('jsonwebtoken');
 const models = require('../models');
 
+//Obtener todos los perfiles.
 exports.get_all = async function () {
     let Profiles = await models.Profile.findAll();
     return { data: Profiles };
 }
 
-
+//Crear nuevo perfil.
 exports.new = function (name) {
 
     return new Promise((resolve, reject) => {
@@ -22,25 +23,13 @@ exports.new = function (name) {
             if (created == true) {
                 resolve({ status: true, msg: "El perfil ha sido creado." });
             } else {
-                resolve({ status: false, msg: "Perfil ya existe" });
+                resolve({ status: false, msg: "Perfil ya existe." });
             }
         });
     });
 }
 
-
-//     if (result) {
-//         return { status: true, msg: "El perfil ha sido creado." };
-
-//     } else {
-//         return { status: false, msg: "No ha sido posible crear el perfil." }
-//     }
-// } catch (error) {
-//     console.log(error)
-//     return { msg: "Error" }
-// }
-
-
+//Actualizar perfil.
 exports.update = function (profile_id, name) {
     models.Profile.update(
         { name: name }, {
@@ -57,6 +46,7 @@ exports.update = function (profile_id, name) {
     return {};
 }
 
+//Eliminar perfil
 exports.delete = async function (profile_id) {
     models.Profile.update(
         { status: 0 }, {

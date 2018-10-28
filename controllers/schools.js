@@ -22,7 +22,7 @@ exports.get_all = async function () {
         status: true,
         obj: schools
     };
-}//falta filtro
+}
 
 
 //Crear colegio
@@ -46,9 +46,9 @@ exports.new = function (data) {
             defaults: school_data
         }).spread((name, created) => {
             if (created == true) {
-                resolve({ status: true, msg: "Colegio creado exitosamente" });
+                resolve({ status: true, msg: "Colegio creado exitosamente." });
             } else {
-                resolve({ status: false, msg: "El colegio ya se encuentra registrado" });
+                resolve({ status: false, msg: "El colegio ya se encuentra registrado." });
             }
         });
     });
