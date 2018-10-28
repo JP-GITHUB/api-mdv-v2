@@ -7,7 +7,7 @@ var profiles_ctr = require('../controllers/profiles');
 const { check, validationResult } = require('express-validator/check');
 
 //Listar perfiles
-router.get('/', middle_auth.validate, middle_auth.veryfy_permisson, async function (req, res, next) {
+router.get('/', middle_auth.validate, /*middle_auth.veryfy_permisson,*/async function (req, res, next) {
 	res.json(await profiles_ctr.get_all());
 });
 
