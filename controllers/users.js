@@ -2,7 +2,7 @@
 
 const models = require('../models');
 
-exports.register = async function (data) {
+exports.register = async function (data, profile_id = 3) {
     let user_data = {
         name: data.name,
         lastname: data.lastname,
@@ -11,7 +11,7 @@ exports.register = async function (data) {
         telephone: data.telephone,
         password: data.password,
         status: true,
-        perfil_id: 3    //perfil id de cliente por defecto
+        perfil_id: profile_id    //perfil id de cliente por defecto
     };
 
     return new Promise((resolve, reject) => {
@@ -101,14 +101,19 @@ exports.forgot_password = async function (email) {
 exports.get_all_dt = async function () {
     let users = await models.User.findAll({
         attributes: ['id', 'name', 'lastname'],
+        where: {
+            status: true
+        },
         raw: true
     });
+
+    let count_regs = users.length;
 
     return {
         data: users,
         draw: 0,
-        recordsFiltered: 3,
-        recordsTotal: 3
+        recordsFiltered: count_regs,
+        recordsTotal: count_regs
     };
 }
 
@@ -118,39 +123,43 @@ exports.get_all = async function () {
 }
 
 exports.update = async function (data) {
-    models.User.update({
-        name: data.name,
-        lastname: data.lastname,
-        rut: data.rut,
-        mail: data.mail,
-        telephone: data.telephone,
-        password: data.password,
-        perfil_id: data.perfil
-    }, {
-            where: {
-                id: data.id
+    return new Promise((resolve, reject) => {
+        models.User.update({
+            name: data.name,
+            lastname: data.lastname,
+            rut: data.rut,
+            mail: data.mail,
+            telephone: data.telephone,
+            password: data.password,
+            perfil_id: data.perfil
+        }, {
+                where: {
+                    id: data.id
+                }
             }
-        }
-    ).then(function (rowsUpdated) {
-        return rowsUpdated;
-    }).catch(err => {
-        return { status: false, msg, err };
+        ).then(function (rowsUpdated) {
+            resolve({ status: true, msg: 'Usuario actualizado correctamente' });
+        }).catch(err => {
+            reject({ status: false, msg, err });
+        });
     });
 }
 
 exports.delete = async function (user_id) {
-    models.User.update({
-        estado: 0
-    },
-        {
-            where: {
-                id: user_id
-            }
-        })
-        .then(function (rowsUpdated) {
-            return rowsUpdated;
-        })
-        .catch(next)
-
-    return {};
+    console.log(user_id)
+    return new Promise((resolve, reject) => {
+        models.User.update({
+            status: false
+        },
+            {
+                where: {
+                    id: user_id
+                }
+            }).then(function (rowsUpdated) {
+                resolve({ status: true, msg: 'Usuario deshabilitado correctamente' });
+            })
+            .catch(err => {
+                reject({ status: false, msg, err });
+            })
+    });
 }

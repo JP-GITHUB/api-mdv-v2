@@ -24,19 +24,6 @@ router.post('/datatables', async function (req, res, next) {
     res.json(await user_ctr.get_all_dt());
 });
 
-router.get('/', middle_auth.validate, async function (req, res, next) {
-    res.json(await user_ctr.get_all());
-});
-
-router.put('/', middle_auth.validate, async function (req, res, next) {
-    let data = req.body;
-    res.json(await user_ctr.update(data));
-});
-
-router.delete('/', middle_auth.validate, async function (req, res, next) {
-    res.json(await user_ctr.delete(req.body.id));
-});
-
 //Registro
 router.post('/register', [
     check('name').not().isEmpty().isLength({ min: 3 }),
@@ -72,4 +59,34 @@ router.post('/change_password', middle_auth.validate, async function (req, res) 
     res.json(await user_ctr.change_password(data));
 });
 
+/** RestFull */
+
+router.get('/', middle_auth.validate, async function (req, res, next) {
+    res.json(await user_ctr.get_all());
+});
+
+router.post('/', [
+    check('name').not().isEmpty().isLength({ min: 3 }),
+    check('mail').not().isEmpty().isEmail(),
+    check('lastname').not().isEmpty().isLength({ min: 3 }),
+    check('rut').not().isEmpty(),
+    check('telephone').not().isEmpty().isLength({ max: 12 }),
+    check('password').not().isEmpty().isLength({ min: 4 })
+], async function (req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+    let data = req.body;
+    res.json(await user_ctr.register(data, 2)); // 2 = Vendedor
+});
+
+router.put('/', middle_auth.validate, async function (req, res, next) {
+    let data = req.body;
+    res.json(await user_ctr.update(data));
+});
+
+router.delete('/:user_id', middle_auth.validate, async function (req, res, next) {
+    res.json(await user_ctr.delete(req.params.user_id));
+});
 module.exports = router;
