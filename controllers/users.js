@@ -127,6 +127,15 @@ exports.get_all = async function () {
     return users;
 }
 
+//Listar todos los usuarios.
+exports.get_by_id = async function (user_id) {
+    return await models.User.findOne({
+        where: {
+            id: user_id
+        }
+    });
+}
+
 //Actualizar usuario.
 exports.update = async function (data) {
     return new Promise((resolve, reject) => {

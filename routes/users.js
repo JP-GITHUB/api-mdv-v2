@@ -19,6 +19,10 @@ router.get('/:id', [check('id').isLength({ max: 3 })], function (req, res, next)
 });
 */
 
+router.get('/:user_id', middle_auth.validate, async function (req, res) {
+    res.json(await user_ctr.get_by_id(req.params.user_id));
+});
+
 /** Datatables example */
 router.post('/datatables', async function (req, res, next) {
     res.json(await user_ctr.get_all_dt());
