@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
         });
 
     Sale.associate = function (models) {
-        //Sale.belongsTo(models.Voucher, { foreignKey: 'voucher_id' });
+        Sale.belongsTo(models.Shoppingcart, { foreignKey: 'shoppingcart_id' });
     };
     return Sale;
 };

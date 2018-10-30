@@ -9,7 +9,6 @@ module.exports = (sequelize, DataTypes) => {
     });
     
     Shoppingcart.associate = function (models) {
-        Shoppingcart.belongsTo(models.Sale, { foreignKey: 'sale_id' });
         Shoppingcart.belongsToMany(models.Product, { through: models.ProductCart, foreignKey: 'shoppingcart_id', contraints: true });
     };
     return Shoppingcart;
