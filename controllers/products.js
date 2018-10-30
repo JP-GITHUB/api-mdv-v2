@@ -27,6 +27,30 @@ exports.get_all = async function () {
     };
 }
 
+//Listar productos por colegio
+exports.get_by_school = async function (school_id) {
+    let product = await models.Product.findAll({
+        where:
+        {
+            school_id: school_id,
+            status: true
+        },
+        include: [models.Gender]
+    });
+
+    if (product === null || product.length == 0) {
+        return {
+            status: false,
+            msg: 'No hay productos para mostrar.'
+        };
+    }
+
+    return {
+        status: true,
+        obj: product
+    };
+}
+
 //Actualizar producto.
 exports.update = function (data) {
     models.Product.update(

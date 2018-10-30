@@ -11,6 +11,12 @@ router.get('/', async function (req, res, next) {
 });
 
 
+//Listar colegios por sucursal
+router.get('/branchoffice/:branchoffice_id', async function (req, res, next) {
+  res.json(await schools_ctr.get_by_branchoffice(req.params.branchoffice_id));
+});
+
+
 //Actualizar colegios
 router.put('/', middle_auth.validate, async function (req, res, next) {	
 	res.json(await schools_ctr.update(req.body.id, req.body.name));
