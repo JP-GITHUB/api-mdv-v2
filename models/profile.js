@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
       underscored: true
     });
   Profile.associate = function (models) {
-    Profile.hasMany(models.User, { foreignKey: 'profile_id' });
+    Profile.hasMany(models.User, { foreignKey: 'profile_id'});
     Profile.belongsToMany(models.Permission, { through: { model: models.ProfilePermission }, contraints: true });
   };
   return Profile;

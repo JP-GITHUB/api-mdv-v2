@@ -13,8 +13,8 @@ module.exports = (sequelize, DataTypes) => {
             underscored: true
         });
     User.associate = function (models) {
-        User.hasMany(models.Sale, { foreignKey: 'user_id' });
-        User.belongsTo(models.Profile, { foreignKey: 'profile_id' });
+        User.hasMany(models.Sale, { foreignKey: 'user_id', allowNull: false });
+        User.belongsTo(models.Profile, { foreignKey: 'profile_id', allowNull: false });
     };
     return User;
 };

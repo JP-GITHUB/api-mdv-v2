@@ -3,6 +3,7 @@
 var jwt = require('jsonwebtoken');
 const models = require('../models');
 
+//Listar productos
 exports.get_all = async function () {
     let product = await models.Product.findAll(
         {
@@ -16,7 +17,7 @@ exports.get_all = async function () {
     if (product === null || product.length == 0) {
         return {
             status: false,
-            msg: 'No hay productos para mostrar'
+            msg: 'No hay productos para mostrar.'
         };
     }
 
@@ -26,6 +27,7 @@ exports.get_all = async function () {
     };
 }
 
+//Actualizar producto.
 exports.update = function (data) {
     models.Product.update(
         {
@@ -46,6 +48,7 @@ exports.update = function (data) {
     return {};
 }
 
+//Actualizar cantidad de producto.
 exports.update_quantity = async function (data) {
     models.Product.update(
         {
@@ -64,24 +67,32 @@ exports.update_quantity = async function (data) {
     return {};
 }
 
+//Crear producto.
 exports.new = async function (data) {
-    models.Product.create(
-        {
-            name: data.name,
-            description: req.bode.description,
-            price: data.price,
-            quantity: 0,
-            status: true
-        }
-    )
-        .then(function (rowCreated) {
-            return rowCreated;
-        })
-        .catch(next)
+    let product_data = {
+        name: data.name,
+        description: data.description,
+        status: true
+    };
 
-    return {};;
+    return new Promise((resolve, reject) => {
+        models.Product.findOrCreate({
+            where: {
+                name: data.name,
+                status: true
+            },
+            defaults: product_data
+        }).spread((name, created) => {
+            if (created == true) {
+                resolve({ status: true, msg: "Producto creado." });
+            } else {
+                resolve({ status: false, msg: "El produto ya existe en la base de datos." });
+            }
+        });
+    });
 }
 
+//Eliminar producto.
 exports.delete = async function (product_id) {
     models.Product.update(
         { status: 0 }, {
