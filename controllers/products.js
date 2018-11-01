@@ -48,7 +48,7 @@ exports.get_by_school = async function(school_id) {
             obj: product
         };
     }
-    //Listar precios de producto p de menor a mayor
+    //Listar precios de producto p de menor a mayor (por validar)
 exports.get_by_product_price = async function(req, res) {
     let product_id = req.params.product_id
     product
@@ -66,7 +66,7 @@ exports.get_by_product_price = async function(req, res) {
                     minval,
                     maxval
                 })
-                .catch(handleError.bind(this, res));
+                .catch(handleError1.bind(this, res));
         });
 
     return {
@@ -76,7 +76,7 @@ exports.get_by_product_price = async function(req, res) {
 
 }
 
-function handleError(res, e) {
+function handleError1(res, e) {
     res
     if (product === null || product.length == 0) {
         return {
@@ -86,7 +86,37 @@ function handleError(res, e) {
     }
 
 }
+//Ver disponibilidad de productos (por validar)
+exports.prod_availability = async function(res, req) {
+    var shopp_quantity;
+    let product_id = req.params.product_id
+    product
+        .findById(product_id).then((quantity) => {
+            if (quantity === null || quantity == 0) {
+                if (shopp_quantity > quantity) {
+                    return {
+                        status: false,
+                        msg: '(No disponible)'
+                    };
+                }
+            } else {
+                return {
+                    status: true,
+                    msg: '(Disponible)'
+                };
+            }
+        })
+        .catch(handleError2.bind(this, res));
+}
 
+function handleError2(res, e) {
+    res
+    return {
+        status: false,
+        msg: 'Ha ocurrido un error'
+    };
+
+}
 
 
 //Actualizar producto.
