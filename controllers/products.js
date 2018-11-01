@@ -4,15 +4,12 @@ var jwt = require('jsonwebtoken');
 const models = require('../models');
 
 //Listar productos
-exports.get_all = async function () {
-    let product = await models.Product.findAll(
-        {
-            where:
-            {
-                status: true,
-            }
+exports.get_all = async function() {
+    let product = await models.Product.findAll({
+        where: {
+            status: true,
         }
-    )
+    })
 
     if (product === null || product.length == 0) {
         return {
@@ -27,10 +24,74 @@ exports.get_all = async function () {
     };
 }
 
+//Listar productos por colegio
+exports.get_by_school = async function(school_id) {
+        let product = await models.Product.findAll({
+            where: {
+                school_id: school_id,
+                status: true
+
+            },
+            include: [models.Gender]
+
+        });
+
+        if (product === null || product.length == 0) {
+            return {
+                status: false,
+                msg: 'No hay productos para mostrar.'
+            };
+        }
+
+        return {
+            status: true,
+            obj: product
+        };
+    }
+    //Listar precios de producto p de menor a mayor
+exports.get_by_product_price = async function(req, res) {
+    let product_id = req.params.product_id
+    product
+        .findById(product_id).then((price) => {
+            var minval, maxval = price
+            for (var val = 0; val < price; val += 1) {
+                if (price[val] < price) {
+                    minval = price[val]
+                }
+                if (price[val] > price) {
+                    maxval = price[val]
+                }
+            }
+            res({
+                    minval,
+                    maxval
+                })
+                .catch(handleError.bind(this, res));
+        });
+
+    return {
+        status: true,
+        obj: res
+    };
+
+}
+
+function handleError(res, e) {
+    res
+    if (product === null || product.length == 0) {
+        return {
+            status: false,
+            msg: 'No hay valores para mostrar.'
+        };
+    }
+
+}
+
+
+
 //Actualizar producto.
-exports.update = function (data) {
-    models.Product.update(
-        {
+exports.update = function(data) {
+    models.Product.update({
             name: data.name,
             description: req.bode.description,
             price: data.price,
@@ -38,9 +99,8 @@ exports.update = function (data) {
             where: {
                 id: data.id
             }
-        }
-    )
-        .then(function (rowsUpdated) {
+        })
+        .then(function(rowsUpdated) {
             return rowsUpdated;
         })
         .catch(next)
@@ -49,17 +109,15 @@ exports.update = function (data) {
 }
 
 //Actualizar cantidad de producto.
-exports.update_quantity = async function (data) {
-    models.Product.update(
-        {
+exports.update_quantity = async function(data) {
+    models.Product.update({
             quantity: data.quantity
         }, {
             where: {
                 id: data.id
             }
-        }
-    )
-        .then(function (rowsUpdated) {
+        })
+        .then(function(rowsUpdated) {
             return rowsUpdated;
         })
         .catch(next)
@@ -68,7 +126,7 @@ exports.update_quantity = async function (data) {
 }
 
 //Crear producto.
-exports.new = async function (data) {
+exports.new = async function(data) {
     let product_data = {
         name: data.name,
         description: data.description,
@@ -93,15 +151,13 @@ exports.new = async function (data) {
 }
 
 //Eliminar producto.
-exports.delete = async function (product_id) {
-    models.Product.update(
-        { status: 0 }, {
+exports.delete = async function(product_id) {
+    models.Product.update({ status: 0 }, {
             where: {
                 id: product_id
             }
-        }
-    )
-        .then(function (rowsUpdated) {
+        })
+        .then(function(rowsUpdated) {
             return rowsUpdated;
         })
         .catch(next)

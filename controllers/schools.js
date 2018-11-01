@@ -24,6 +24,27 @@ exports.get_all = async function () {
     };
 }
 
+exports.get_by_branchoffice = async (branchoffice_id) => {
+    let schools = await models.School.findAll(
+        {
+            where:
+            {
+                branchoffice_id: branchoffice_id,
+                status: true
+            }
+        }
+    )
+    if (schools === null || schools.length == 0) {
+        return {
+            status: false,
+            msg: 'No hay colegios que mostrar'
+        };
+    }
+    return {
+        status: true,
+        obj: schools
+    };
+}
 
 //Crear colegio
 exports.new = function (data) {

@@ -13,6 +13,11 @@ router.get('/', middle_auth.validate,  async function (req, res, next) {
     res.json(await product_ctr.get_all());
 });
 
+//Listar productos por colegio.
+router.get('/school/:school_id', async function (req, res, next) {
+    res.json(await product_ctr.get_by_school(req.params.school_id));
+});
+
 //Crear producto.
 router.post('/', middle_auth.validate, [
     check('name').not().isEmpty(),
