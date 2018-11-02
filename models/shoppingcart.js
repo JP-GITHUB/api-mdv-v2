@@ -1,7 +1,6 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
     const Shoppingcart = sequelize.define('Shoppingcart', {
-        totalitem: Datatypes.INTEGER,
         totalvalue: DataTypes.INTEGER,
         status: DataTypes.BOOLEAN
     }, {
