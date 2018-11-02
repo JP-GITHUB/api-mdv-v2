@@ -8,6 +8,7 @@ module.exports = (sequelize, DataTypes) => {
       underscored: true
     });
   ProductSize.associate = function (models) {
+    ProductSize.belongsTo(models.Product);
   };
   return ProductSize;
 };

@@ -35,7 +35,26 @@ exports.get_by_school = async function (school_id) {
             school_id: school_id,
             status: true
         },
-        include: [models.Gender]
+        include: [
+            {
+                model: models.Gender
+            },
+            {
+                model: models.ProductSize
+            }
+        ]
+    });
+
+    product.forEach(element => {
+        let item;
+        let data = element.ProductSizes;
+        let arr_prices = [];
+        for (item in data) {
+            arr_prices.push(data[item].price);
+        }
+
+        element.dataValues['min_price'] = Math.min.apply(null, arr_prices);
+        element.dataValues['max_price'] = Math.max.apply(null, arr_prices);
     });
 
     if (product === null || product.length == 0) {

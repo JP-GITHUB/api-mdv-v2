@@ -1,6 +1,7 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
   const ProductCart = sequelize.define('ProductCart', {
+    shop_quantity: DataTypes.INTEGER
   }, {
       tableName: 'PRODUCT_SHOPPINGCART',
       underscored: true
