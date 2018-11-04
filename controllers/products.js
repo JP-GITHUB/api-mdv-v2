@@ -53,6 +53,11 @@ exports.get_by_school = async function (school_id) {
         element.dataValues['min_price'] = Math.min.apply(null, arr_prices);
         element.dataValues['max_price'] = Math.max.apply(null, arr_prices);
     });
+
+    return {
+        status: true,
+        obj: product
+    }
 }
 
 //Listar precios de producto p de menor a mayor (por validar)
