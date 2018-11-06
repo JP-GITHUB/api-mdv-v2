@@ -2,6 +2,19 @@ var express = require('express');
 var models = require('../models');
 var router = express.Router();
 
+const multer = require('multer');
+
+//"Estrategia de salvado de nuevas imágenes entrantes"
+const storage = multer.diskStorage({
+    destination: function(req, file, cb){
+        cb(null, './uploads');
+    },
+    filename: function(req, file, cb){
+        cb(null, file.originalname)
+    }
+});
+const upload = multer ({ storage: storage});
+
 var middle_auth = require('../middlewares/auth');
 var product_ctr = require('../controllers/products');
 
@@ -23,10 +36,11 @@ router.get('/', async function(req, res, next) {
 });
 
 //Crear producto.
-router.post('/', middle_auth.validate, [
+router.post('/', upload.single('productImage'), middle_auth.validate, [
     check('name').not().isEmpty(),
     check('description').not().isEmpty().isLength({ min: 4 })
 ], async function(req, res, next) {
+    console.log(req.file)
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
