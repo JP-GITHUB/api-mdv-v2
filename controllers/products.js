@@ -27,6 +27,7 @@ exports.get_all = async function () {
 //Listar productos por colegio
 exports.get_by_school = async function (school_id) {
     let product = await models.Product.findAll({
+        attributes: ['id', 'name', 'description'],
         where:
         {
             school_id: school_id,
@@ -34,10 +35,16 @@ exports.get_by_school = async function (school_id) {
         },
         include: [
             {
-                model: models.Gender
+                model: models.Gender                
             },
             {
-                model: models.ProductSize
+                model: models.ProductSize,
+                attributes: ['quantity', 'price'],
+                include: [{
+                    model: models.Size,
+                    attributes: ['id', 'description']
+                }]
+
             }
         ]
     });

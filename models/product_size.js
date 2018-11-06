@@ -9,6 +9,7 @@ module.exports = (sequelize, DataTypes) => {
     });
   ProductSize.associate = function (models) {
     ProductSize.belongsTo(models.Product);
+    ProductSize.belongsTo(models.Size);
   };
   return ProductSize;
 };
