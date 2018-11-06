@@ -9,6 +9,7 @@ var profilesRouter = require('./routes/profiles');
 var usersRouter = require('./routes/users');
 var productsRouter = require('./routes/products');
 var schoolsRouter = require('./routes/schools');
+var branchOfficeRouter = require('./routes/branch-offices');
 
 /*instanciamos express*/
 var app = express();
@@ -25,5 +26,6 @@ app.use('/profiles', profilesRouter);
 app.use('/users', usersRouter);
 app.use('/products', productsRouter);
 app.use('/schools', schoolsRouter);
+app.use('/branch-offices', branchOfficeRouter);
 
 module.exports = app;
