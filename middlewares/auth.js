@@ -23,7 +23,7 @@ exports.validate = function (req, res, next) {
     next();
 }
 
-exports.veryfy_permisson = function (req, res, next) {
+exports.verify_permisson = function (req, res, next) {
     var token = req.headers['authorization'];
     token = token.replace('Bearer ', '');
 
