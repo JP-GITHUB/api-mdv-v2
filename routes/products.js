@@ -13,7 +13,10 @@ const storage = multer.diskStorage({
         cb(null, file.originalname)
     }
 });
-const upload = multer ({ storage: storage});
+
+//Estrategia para subir imágenes.
+const upload = multer ({ storage: storage}).array('productImage', 5);
+
 
 var middle_auth = require('../middlewares/auth');
 var product_ctr = require('../controllers/products');
@@ -36,7 +39,7 @@ router.get('/', async function(req, res, next) {
 });
 
 //Crear producto.
-router.post('/', upload.single('productImage'), middle_auth.validate, [
+router.post('/', upload.array('productImage', 5), middle_auth.validate, [
     check('name').not().isEmpty(),
     check('description').not().isEmpty().isLength({ min: 4 })
 ], async function(req, res, next) {
