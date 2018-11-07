@@ -10,19 +10,16 @@ const storage = multer.diskStorage({
         cb(null, './uploads');
     },
     filename: function(req, file, cb){
-        cb(null, file.originalname)
+        cb(null, file.originalname + '-' + Date.now());
     }
 });
 
-//Estrategia para subir imágenes.
 const upload = multer ({ storage: storage});
-
 
 var middle_auth = require('../middlewares/auth');
 var product_ctr = require('../controllers/products');
 
 const { check, validationResult } = require('express-validator/check');
-
 
 //Listar productos.
 router.get('/', async function(req, res, next) {

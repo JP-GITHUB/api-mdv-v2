@@ -24,13 +24,13 @@ router.get('/:branchOffice_id', middle_auth.validate, async function (req, res) 
 });
 
 /** Datatables example */
-router.post('/datatables', async function (req, res, next) {
+router.post('/datatables', middle_auth.validate, async function (req, res, next) {
     res.json(await branchOffice_ctr.get_all_dt());
 });
 
 /** RestFull */
 
-router.get('/', middle_auth.validate, async function (req, res, next) {
+router.get('/', async function (req, res, next) {
     res.json(await branchOffice_ctr.get_all());
 });
 
