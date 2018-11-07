@@ -3,7 +3,7 @@
 const models = require('../models');
 
 //Registrar sucursal
-exports.register = async function() {
+exports.new = async function() {
     let branchOffice_data = {
         name: data.name,
         location: data.location,
@@ -17,7 +17,7 @@ exports.register = async function() {
                 name: branchOffice_data.name,
             },
             defaults: branchOffice_data
-        }).spread((BranchOffice, created) => {
+        }).spread((name, created) => {
             if (created == true) {
                 resolve({ status: true, msg: "Sucursal creada exitosamente." });
             } else {
