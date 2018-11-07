@@ -34,7 +34,7 @@ router.get('/', async function (req, res, next) {
     res.json(await branchOffice_ctr.get_all());
 });
 
-router.post('/', [
+router.post('/', middle_auth.validate, [
     check('name').not().isEmpty().isLength({ min: 3, max: 50 }),
     check('location').not().isEmpty().isLength({min: 3, max: 255}),
     check('telephone').not().isEmpty().isLength({ min: 3, max: 16}),

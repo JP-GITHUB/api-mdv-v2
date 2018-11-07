@@ -3,7 +3,7 @@
 const models = require('../models');
 
 //Registrar sucursal
-exports.new = async function() {
+exports.new = async function(data) {
     let branchOffice_data = {
         name: data.name,
         location: data.location,
@@ -14,7 +14,7 @@ exports.new = async function() {
     return new Promise((resolve, reject) => {
         models.BranchOffice.findOrCreate({
             where: {
-                name: branchOffice_data.name,
+                name: data.name,
             },
             defaults: branchOffice_data
         }).spread((name, created) => {
