@@ -15,7 +15,7 @@ const storage = multer.diskStorage({
 });
 
 //Estrategia para subir imágenes.
-const upload = multer ({ storage: storage}).array('productImage', 5);
+const upload = multer ({ storage: storage});
 
 
 var middle_auth = require('../middlewares/auth');
@@ -25,7 +25,7 @@ const { check, validationResult } = require('express-validator/check');
 
 
 //Listar productos.
-router.get('/', middle_auth.validate, async function(req, res, next) {
+router.get('/', async function(req, res, next) {
     res.json(await product_ctr.get_all());
 });
 
