@@ -19,22 +19,18 @@ const fileFilter = function (req, res, cb){
     var extname = filetypes.test(path.extname(file.originalname).toLocaleLowerCase());
 
     if (mimetype && extname){
-        return callback (null, true);
+        return cb (null, true);
     }
     req.invalid_files.push(file.originalname);
     console.log('Archivo inválido: ' + file.originalname + '' + file.mimetype);
     cb(null, false);
 }
 
-const upload = multer ({ storage: storage});
-//arreglar !!!!
+const maxCount = 5;
 
-const maxCount = 10;
-
-const upload = multer({
+const upload = multer ({ 
     fileFilter: fileFilter,
-    storage: storage,
-    limits: limits
+    storage: storage
 }).array('images[]', maxCount);
 
 module.exports = upload;
