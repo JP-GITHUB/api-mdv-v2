@@ -78,7 +78,6 @@ exports.update = async function(data) {
 
 //Eliminar sucursal.
 exports.delete = async function(branchOffice_id) {
-    console.log(user_id)
     return new Promise((resolve, reject) => {
         models.BranchOffice.update({
                 status: false
