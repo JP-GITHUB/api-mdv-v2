@@ -10,6 +10,7 @@ var usersRouter = require('./routes/users');
 var productsRouter = require('./routes/products');
 var schoolsRouter = require('./routes/schools');
 var branchOfficeRouter = require('./routes/branch-offices');
+var salesRouter = require('./routes/sales');
 
 /*instanciamos express*/
 var app = express();
@@ -27,5 +28,6 @@ app.use('/users', usersRouter);
 app.use('/products', productsRouter);
 app.use('/schools', schoolsRouter);
 app.use('/branch-offices', branchOfficeRouter);
+app.use('/sales', salesRouter);
 
 module.exports = app;

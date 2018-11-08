@@ -39,3 +39,10 @@ exports.verify_permisson = function (req, res, next) {
     })
     next();
 }
+
+exports.decode_token = function (token) {
+    token = token.replace('Bearer ', '');
+
+    let data_token =jwt.decode(token, 'estoesultrasecreto');
+    return data_token;
+}
