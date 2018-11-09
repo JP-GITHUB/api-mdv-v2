@@ -1,7 +1,7 @@
 {
   "development": {
     "username": "postgres",
-    "password": "admin",
+    "password": "Alucard",
     "database": "mdvdb_development",
     "host": "localhost",
     "dialect": "postgres"

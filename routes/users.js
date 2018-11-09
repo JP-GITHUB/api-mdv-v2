@@ -23,7 +23,7 @@ router.get('/:user_id', middle_auth.validate, async function (req, res) {
 });
 
 /** Datatables example */
-router.post('/datatables', async function (req, res, next) {
+router.post('/datatables',  async function (req, res, next) {
     res.json(await user_ctr.get_all_dt());
 });
 

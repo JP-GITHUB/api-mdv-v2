@@ -3,7 +3,7 @@
 const models = require('../models');
 
 //Registrar sucursal
-exports.register = async function() {
+exports.new = async function(data) {
     let branchOffice_data = {
         name: data.name,
         location: data.location,
@@ -14,10 +14,10 @@ exports.register = async function() {
     return new Promise((resolve, reject) => {
         models.BranchOffice.findOrCreate({
             where: {
-                name: branchOffice_data.name,
+                name: data.name,
             },
             defaults: branchOffice_data
-        }).spread((BranchOffice, created) => {
+        }).spread((name, created) => {
             if (created == true) {
                 resolve({ status: true, msg: "Sucursal creada exitosamente." });
             } else {
@@ -78,7 +78,6 @@ exports.update = async function(data) {
 
 //Eliminar sucursal.
 exports.delete = async function(branchOffice_id) {
-    console.log(user_id)
     return new Promise((resolve, reject) => {
         models.BranchOffice.update({
                 status: false

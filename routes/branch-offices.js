@@ -24,19 +24,19 @@ router.get('/:branchOffice_id', middle_auth.validate, async function (req, res) 
 });
 
 /** Datatables example */
-router.post('/datatables', async function (req, res, next) {
+router.post('/datatables', middle_auth.validate, async function (req, res, next) {
     res.json(await branchOffice_ctr.get_all_dt());
 });
 
 /** RestFull */
 
-router.get('/', middle_auth.validate, async function (req, res, next) {
+router.get('/', async function (req, res, next) {
     res.json(await branchOffice_ctr.get_all());
 });
 
-router.post('/', [
-    check('name').not().isEmpty().isLength({ min: 3, max: 25 }),
-    check('location').not().isEmpty().isLength({min: 3, max: 15}),
+router.post('/', middle_auth.validate, [
+    check('name').not().isEmpty().isLength({ min: 3, max: 50 }),
+    check('location').not().isEmpty().isLength({min: 3, max: 255}),
     check('telephone').not().isEmpty().isLength({ min: 3, max: 16}),
 ], async function (req, res, next) {
     const errors = validationResult(req);
@@ -44,7 +44,7 @@ router.post('/', [
         return res.status(422).json({ errors: errors.array() });
     }
     let data = req.body;
-    res.json(await branchOffice_ctr.register(data, 2)); // 2 = Vendedor
+    res.json(await branchOffice_ctr.new(data));
 });
 
 router.put('/', middle_auth.validate, async function (req, res, next) {
