@@ -19,6 +19,7 @@ app.use(cors());
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(express.static('uploads'));
 
 /*definimos la ruta inicial y recurso a utilizar*/
 app.use('/', indexRouter);
