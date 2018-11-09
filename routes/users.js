@@ -1,5 +1,4 @@
 var express = require('express');
-var models = require('../models');
 var middle_auth = require('../middlewares/auth');
 var router = express.Router();
 

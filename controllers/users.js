@@ -1,9 +1,10 @@
 'use strict'
 
 const models = require('../models');
+var middle_auth = require('../middlewares/auth');
 
 //Registrar usuario
-exports.register = async function(data, profile_id = 3) {
+exports.register = async function (data, profile_id = 3) {
     let user_data = {
         name: data.name,
         lastname: data.lastname,
@@ -35,7 +36,7 @@ exports.register = async function(data, profile_id = 3) {
 }
 
 //Cambiar contraseña
-exports.change_password = async function(data) {
+exports.change_password = async function (data) {
     let mail = data.mail;
     let old_pass = data.old_pass;
     let new_pass = data.new_pass;
@@ -45,14 +46,14 @@ exports.change_password = async function(data) {
         return { status: false, msg: 'No coinciden las contraseñas' };
     } else {
         models.User.update({
-                password: new_pass
-            }, {
+            password: new_pass
+        }, {
                 where: {
                     mail: mail,
                     password: old_pass
                 }
             })
-            .then(function(rowsUpdated) {
+            .then(function (rowsUpdated) {
                 return { status: true, msg: 'Se actualizo correctamente' };
             })
             .catch(err => {
@@ -62,7 +63,7 @@ exports.change_password = async function(data) {
 }
 
 //Recuperar contraseña
-exports.forgot_password = async function(email) {
+exports.forgot_password = async function (email) {
     const sgMail = require('@sendgrid/mail');
     const random_hash = require('random-hash');
 
@@ -79,13 +80,13 @@ exports.forgot_password = async function(email) {
     let response = sgMail.send(msg);
     response.then(result => {
         models.User.update({
-                password: tmp_pass
-            }, {
+            password: tmp_pass
+        }, {
                 where: {
                     mail: email
                 }
             })
-            .then(function(rowsUpdated) {
+            .then(function (rowsUpdated) {
 
             })
             .catch(err => {
@@ -102,7 +103,7 @@ exports.forgot_password = async function(email) {
 }
 
 
-exports.get_all_dt = async function() {
+exports.get_all_dt = async function () {
     let users = await models.User.findAll({
         attributes: ['id', 'name', 'lastname'],
         where: {
@@ -122,13 +123,13 @@ exports.get_all_dt = async function() {
 }
 
 //Listar todos los usuarios.
-exports.get_all = async function() {
+exports.get_all = async function () {
     let users = await models.User.findAll();
     return users;
 }
 
 //Listar todos los usuarios.
-exports.get_by_id = async function(user_id) {
+exports.get_by_id = async function (user_id) {
     return await models.User.findOne({
         where: {
             id: user_id
@@ -136,8 +137,13 @@ exports.get_by_id = async function(user_id) {
     });
 }
 
+exports.get_user_in_token = function (token) {
+    let data_jwt = middle_auth.get_data_token(token);
+    return data_jwt;
+}
+
 //Actualizar usuario.
-exports.update = async function(data) {
+exports.update = async function (data) {
     return new Promise((resolve, reject) => {
         models.User.update({
             name: data.name,
@@ -148,28 +154,28 @@ exports.update = async function(data) {
             password: data.password,
             perfil_id: data.perfil
         }, {
-            where: {
-                id: data.id
-            }
-        }).then(function(rowsUpdated) {
-            resolve({ status: true, msg: 'Usuario actualizado correctamente' });
-        }).catch(err => {
-            reject({ status: false, msg, err });
-        });
+                where: {
+                    id: data.id
+                }
+            }).then(function (rowsUpdated) {
+                resolve({ status: true, msg: 'Usuario actualizado correctamente' });
+            }).catch(err => {
+                reject({ status: false, msg, err });
+            });
     });
 }
 
 //Eliminar usuario.
-exports.delete = async function(user_id) {
+exports.delete = async function (user_id) {
     console.log(user_id)
     return new Promise((resolve, reject) => {
         models.User.update({
-                status: false
-            }, {
+            status: false
+        }, {
                 where: {
                     id: user_id
                 }
-            }).then(function(rowsUpdated) {
+            }).then(function (rowsUpdated) {
                 resolve({ status: true, msg: 'Usuario deshabilitado correctamente' });
             })
             .catch(err => {
