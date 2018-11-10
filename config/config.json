@@ -4,7 +4,10 @@
     "password": "jp123456",
     "database": "mdvdb_development",
     "host": "localhost",
-    "dialect": "postgres"
+    "dialect": "postgres",
+    "dialectOption": {
+      "ssl": true
+    }
   },
   "test": {
     "username": "root",
