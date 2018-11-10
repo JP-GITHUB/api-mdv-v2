@@ -5,7 +5,7 @@
     "database": "dc7lk692rapvqn",
     "host": "ec2-50-16-196-138.compute-1.amazonaws.com",
     "dialect": "postgres",
-    "dialectOption": {
+    "dialectOptions": {
       "ssl": true
     }
   },
