@@ -94,16 +94,27 @@ exports.get_by_code = (code) => {
 }
 
 exports.deliver = async (code) => {
-  let result = await models.Sale.update({
-    delivered: true
-  },
-    {
-      where: { code: code }
-    });
+  let exist = await models.Sale.findOne({
+    where: {
+      code: code,
+      delivered: true
+    }
+  });
 
-  if (result) {
-    return { status: true, data: result };
+  if (exist) {
+    return { status: false, msg: 'Producto ya se encuentra entregado' }
   } else {
-    return { status: false }
+    let result = await models.Sale.update({
+      delivered: true
+    },
+      {
+        where: { code: code }
+      });
+
+    if (result) {
+      return { status: true, msg: 'Se registro la entrega correctamente.' };
+    } else {
+      return { status: false, msg: 'Hubo un problema al registrar la entega.' }
+    }
   }
 }
