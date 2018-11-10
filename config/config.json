@@ -1,9 +1,9 @@
 {
   "development": {
-    "username": "postgres",
-    "password": "jp123456",
-    "database": "mdvdb_development",
-    "host": "localhost",
+    "username": "wmdkodfwiddtnt",
+    "password": "8fbc7da4a466a18b27b8a38ebb5a895cb932e51a3b976f367996a593b8f3abe3",
+    "database": "dc7lk692rapvqn",
+    "host": "ec2-50-16-196-138.compute-1.amazonaws.com",
     "dialect": "postgres",
     "dialectOption": {
       "ssl": true
