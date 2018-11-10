@@ -5,6 +5,8 @@ module.exports = (sequelize, DataTypes) => {
         name_retirement: DataTypes.STRING(80),
         discount: DataTypes.INTEGER,
         final_value: DataTypes.INTEGER,
+        code: DataTypes.STRING(50),
+        delivered: DataTypes.BOOLEAN,
         status: DataTypes.BOOLEAN
     },
         {
