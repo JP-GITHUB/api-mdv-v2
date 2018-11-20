@@ -4,7 +4,8 @@ const models = require('../models');
 var middle_auth = require('../middlewares/auth');
 
 //Registrar usuario
-exports.register = async function (data, profile_id = 3) {
+exports.register = async function (data, profile_id = 2) {
+    console.log(data);
     let user_data = {
         name: data.name,
         lastname: data.lastname,

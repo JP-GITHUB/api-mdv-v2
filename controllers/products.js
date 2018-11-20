@@ -35,7 +35,7 @@ exports.get_by_school = async function (school_id) {
         },
         include: [
             {
-                model: models.Gender                
+                model: models.Gender             
             },
             {
                 model: models.ProductSize,
@@ -45,10 +45,14 @@ exports.get_by_school = async function (school_id) {
                     attributes: ['id', 'description']
                 }]
 
+            },
+            {
+                model: models.ProductImage 
             }
         ]
     });
 
+    console.log(product);
     product.forEach(element => {
         let item;
         let data = element.ProductSizes;
