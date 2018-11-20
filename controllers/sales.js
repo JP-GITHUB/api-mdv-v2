@@ -1,9 +1,11 @@
 'use strict'
 
+var jwt = require('jsonwebtoken');
 const models = require('../models');
-var middle_auth = require('../middlewares/auth');
+const middle_auth = require('../middlewares/auth');
+const ctr_payments = require('../controllers/payments');
 
-exports.new = async function (req) {
+exports.new = async (req) => {
   let token = req.headers.authorization;
   let data_token = middle_auth.get_data_token(token);
   let code = Math.random().toString(36).substr(2, 4);;
@@ -50,13 +52,23 @@ exports.new = async function (req) {
     await models.ProductCart.bulkCreate(arrProducts, { transaction });
 
 
-    let new_sale = await models.Sale.create({
+    let pay_generated = await ctr_payments.generate('Teste!', total);
+    let payment_id = null;
+    if (!pay_generated.status) {
+      throw new Error('Error al generar el pago.');
+    } else {
+      payment_id = pay_generated.obj.payment_id;
+    }
+
+    await models.Sale.create({
       rut_retirement: data.rut,
       name_retirement: data.firstName + " " + data.lastName,
       discount: 0,
       final_value: total,
       status: true,
+      payment_status: 0, // 0 Pendiente de pago, 1 Pagada, 2 rechazada
       payment_method_id: 1,
+      payment_id: payment_id,
       code: code,
       delivered: false,
       shoppingcart_id: new_cart.id,
@@ -65,7 +77,13 @@ exports.new = async function (req) {
 
     await transaction.commit();
 
-    return { status: true, msg: 'La venta fue realizada exitosamente', retirement_code: code };
+    return {
+      status: true,
+      msg: 'La venta fue realizada exitosamente',
+      retirement_code: code,
+      payment_id: pay_generated.obj.payment_id,
+      transfer_url: pay_generated.obj.transfer_url
+    };
 
   } catch (err) {
     console.log(err);
@@ -116,5 +134,24 @@ exports.deliver = async (code) => {
     } else {
       return { status: false, msg: 'Hubo un problema al registrar la entega.' }
     }
+  }
+}
+
+exports.confirm_sale = async (data) => {
+  try {
+    let result = await models.Sale.update({
+      payment_status: 1
+    }, {
+        where: {
+          payment_id: data.payment_id
+        }
+      });
+
+    if (result) {
+      return true;
+    }
+  } catch (error) {
+    console.log(error);
+    return false;
   }
 }
