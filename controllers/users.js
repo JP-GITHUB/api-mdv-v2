@@ -14,7 +14,7 @@ exports.register = async function (data, profile_id = 2) {
         telephone: data.telephone,
         password: data.password,
         status: true,
-        perfil_id: profile_id //perfil id de cliente por defecto
+        profile_id: profile_id //perfil id de cliente por defecto
     };
 
     return new Promise((resolve, reject) => {
