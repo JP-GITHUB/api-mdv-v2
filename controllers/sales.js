@@ -1,5 +1,6 @@
 'use strict'
 
+var jwt = require('jsonwebtoken');
 const models = require('../models');
 const middle_auth = require('../middlewares/auth');
 const ctr_payments = require('../controllers/payments');

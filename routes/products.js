@@ -1,5 +1,4 @@
 var express = require('express');
-var models = require('../models');
 var router = express.Router();
 
 var middle_auth = require('../middlewares/auth');
@@ -33,6 +32,11 @@ router.post('/', middle_auth.validate, [
     }
     let data = req.body;
     res.json(await product_ctr.new(data));
+});
+
+//DT
+router.post('/datatables', middle_auth.validate, async function (req, res, next) {
+    res.json(await product_ctr.get_all_dt());
 });
 
 //Actualizar producto.
