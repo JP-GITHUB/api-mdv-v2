@@ -52,7 +52,7 @@ exports.new = async (req) => {
     await models.ProductCart.bulkCreate(arrProducts, { transaction });
 
 
-    let pay_generated = await ctr_payments.generate('Teste!', total);
+    let pay_generated = await ctr_payments.generate('Confecciones Margarita del Villar', total);
     let payment_id = null;
     if (!pay_generated.status) {
       throw new Error('Error al generar el pago.');
