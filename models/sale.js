@@ -6,6 +6,8 @@ module.exports = (sequelize, DataTypes) => {
         discount: DataTypes.INTEGER,
         final_value: DataTypes.INTEGER,
         code: DataTypes.STRING(50),
+        payment_id: DataTypes.STRING(100),
+        payment_status: DataTypes.INTEGER,
         delivered: DataTypes.BOOLEAN,
         status: DataTypes.BOOLEAN
     },
