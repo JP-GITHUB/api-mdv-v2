@@ -160,21 +160,20 @@ function handleError2(res, e) {
 
 //Actualizar producto.
 exports.update = function (data) {
-    models.Product.update({
-        name: data.name,
-        description: req.bode.description,
-        price: data.price,
-    }, {
+    return new Promise((resolve, reject) => {
+        models.Product.update({
+            name: data.name,
+        description: data.description
+        }, {
             where: {
                 id: data.id
             }
-        })
-        .then(function (rowsUpdated) {
-            return rowsUpdated;
-        })
-        .catch(next)
-
-    return {};
+        }).then(function(rowsUpdated) {
+            resolve({ status: true, msg: 'Producto actualizado correctamente' });
+        }).catch(err => {
+            reject({ status: false, msg, err });
+        });
+    });
 }
 
 //Actualizar cantidad de producto.
@@ -213,7 +212,7 @@ exports.new = async function (data) {
             if (created == true) {
                 resolve({ status: true, msg: "Producto creado." });
             } else {
-                resolve({ status: false, msg: "El produto ya existe en la base de datos." });
+                reject({ status: false, msg: "El produto ya existe en la base de datos." });
             }
         });
     });
@@ -221,15 +220,19 @@ exports.new = async function (data) {
 
 //Eliminar producto.
 exports.delete = async function (product_id) {
-    models.Product.update({ status: 0 }, {
-        where: {
-            id: product_id
-        }
-    })
-        .then(function (rowsUpdated) {
-            return rowsUpdated;
-        })
-        .catch(next)
 
-    return {};
+    return new Promise((resolve, reject) =>{
+        models.Product.update({ status: 0 }, {
+            where: {
+                id: product_id
+            }
+        })
+            .then(function (rowsUpdated) {
+            resolve({ status: true, msg: "Producto Eliminado." })
+        })
+        .catch(function(err){
+
+            reject({ status: false, msg: "Error al eliminar producto." });
+        });
+    });
 }
