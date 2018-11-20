@@ -67,6 +67,22 @@ exports.get_by_school = async function (school_id) {
     }
 }
 
+//productos para cargar el dtt
+exports.get_all_dt = async function() {
+    let products = await models.Product.findAll({
+        attributes: ['id', 'name', 'description'],        
+    });
+
+    let count_regs = products.length;
+
+    return {
+        data: products,
+        draw: 0,
+        recordsFiltered: count_regs,
+        recordsTotal: count_regs
+    };
+}
+
 //Listar precios de producto p de menor a mayor (por validar)
 exports.get_by_product_price = async function (req, res) {
     let product_id = req.params.product_id
