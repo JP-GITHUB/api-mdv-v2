@@ -52,8 +52,8 @@ router.put('/quantity', middle_auth.validate, async function(req, res, next) {
 });
 
 //Eliminar producto.
-router.delete('/', middle_auth.validate, async function(req, res, next) {
-    res.json(await product_ctr.delete(req.body.id));
+router.delete('/:product_id', middle_auth.validate, async function(req, res, next) {
+    res.json(await product_ctr.delete(req.params.product_id));
 });
 
 module.exports = router;
