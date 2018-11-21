@@ -35,7 +35,7 @@ exports.get_by_school = async function (school_id) {
         },
         include: [
             {
-                model: models.Gender             
+                model: models.Gender
             },
             {
                 model: models.ProductSize,
@@ -47,12 +47,11 @@ exports.get_by_school = async function (school_id) {
 
             },
             {
-                model: models.ProductImage 
+                model: models.ProductImage
             }
         ]
     });
 
-    console.log(product);
     product.forEach(element => {
         let item;
         let data = element.ProductSizes;
@@ -69,6 +68,27 @@ exports.get_by_school = async function (school_id) {
         status: true,
         obj: product
     }
+}
+
+//productos para cargar el dtt
+exports.get_all_dt = async function () {
+    let products = await models.Product.findAll({
+        attributes: ['id', 'name', 'description'],
+        include:
+            [
+                { model: models.School },
+                { model: models.Gender }
+            ]
+    });
+
+    let count_regs = products.length;
+
+    return {
+        data: products,
+        draw: 0,
+        recordsFiltered: count_regs,
+        recordsTotal: count_regs
+    };
 }
 
 //Listar precios de producto p de menor a mayor (por validar)
@@ -144,21 +164,22 @@ function handleError2(res, e) {
 
 //Actualizar producto.
 exports.update = function (data) {
-    models.Product.update({
-        name: data.name,
-        description: req.bode.description,
-        price: data.price,
-    }, {
-            where: {
-                id: data.id
-            }
-        })
-        .then(function (rowsUpdated) {
-            return rowsUpdated;
-        })
-        .catch(next)
-
-    return {};
+    return new Promise((resolve, reject) => {
+        models.Product.update({
+            name: data.name,
+            description: data.description,
+            gender_id: data.gender_id,
+            school_id: data.school_id
+        }, {
+                where: {
+                    id: data.id
+                }
+            }).then(function (rowsUpdated) {
+                resolve({ status: true, msg: 'Producto actualizado correctamente' });
+            }).catch(err => {
+                reject({ status: false, msg, err });
+            });
+    });
 }
 
 //Actualizar cantidad de producto.
@@ -183,7 +204,9 @@ exports.new = async function (data) {
     let product_data = {
         name: data.name,
         description: data.description,
-        status: true
+        status: true,
+        school_id: data.school,
+        gender_id: data.gender
     };
 
     return new Promise((resolve, reject) => {
@@ -197,7 +220,7 @@ exports.new = async function (data) {
             if (created == true) {
                 resolve({ status: true, msg: "Producto creado." });
             } else {
-                resolve({ status: false, msg: "El produto ya existe en la base de datos." });
+                reject({ status: false, msg: "El produto ya existe en la base de datos." });
             }
         });
     });
@@ -205,15 +228,36 @@ exports.new = async function (data) {
 
 //Eliminar producto.
 exports.delete = async function (product_id) {
-    models.Product.update({ status: 0 }, {
-        where: {
-            id: product_id
-        }
-    })
-        .then(function (rowsUpdated) {
-            return rowsUpdated;
-        })
-        .catch(next)
 
-    return {};
+    return new Promise((resolve, reject) => {
+        models.Product.update({ status: 0 }, {
+            where: {
+                id: product_id
+            }
+        })
+            .then(function (rowsUpdated) {
+                resolve({ status: true, msg: "Producto Eliminado." })
+            })
+            .catch(function (err) {
+
+                reject({ status: false, msg: "Error al eliminar producto." });
+            });
+    });
+}
+
+exports.getGender = async function () {
+    let gender = await models.Gender.findAll({
+    })
+
+    if (gender === null || gender.length == 0) {
+        return {
+            status: false,
+            msg: 'No hay productos para mostrar.'
+        };
+    }
+
+    return {
+        status: true,
+        obj: gender
+    };
 }

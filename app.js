@@ -11,6 +11,7 @@ var productsRouter = require('./routes/products');
 var schoolsRouter = require('./routes/schools');
 var branchOfficeRouter = require('./routes/branch-offices');
 var salesRouter = require('./routes/sales');
+var paymentsRouter = require('./routes/payments');
 
 /*instanciamos express*/
 var app = express();
@@ -30,5 +31,6 @@ app.use('/products', productsRouter);
 app.use('/schools', schoolsRouter);
 app.use('/branch-offices', branchOfficeRouter);
 app.use('/sales', salesRouter);
+app.use('/payments', paymentsRouter);
 
 module.exports = app;

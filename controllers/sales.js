@@ -1,9 +1,31 @@
 'use strict'
 
+var jwt = require('jsonwebtoken');
 const models = require('../models');
-var middle_auth = require('../middlewares/auth');
+const middle_auth = require('../middlewares/auth');
+const ctr_payments = require('../controllers/payments');
 
-exports.new = async function (req) {
+async function get_product_quantity(product_id, size_id) {
+  let product = await models.Product.findOne({
+    attributes: ['id', 'status'],
+    where: {
+      id: product_id
+    },
+    include: [{
+      model: models.ProductSize,
+      attributes: ['quantity'],
+      where: {
+        product_id: product_id,
+        size_id: size_id
+      }
+    }],
+    raw: true
+  });
+
+  return product['ProductSizes.quantity'];
+}
+
+exports.new = async (req) => {
   let token = req.headers.authorization;
   let data_token = middle_auth.get_data_token(token);
   let code = Math.random().toString(36).substr(2, 4);;
@@ -13,11 +35,14 @@ exports.new = async function (req) {
   let arrProducts = [];
   let total = 0;
 
+  let err_msg = null;
+
   try {
     transaction = await models.sequelize.transaction();
 
     if (!data.products) {
-      throw new Error('Sin productos para realizar la venta.')
+      err_msg = 'Sin productos para realizar la venta.';
+      throw new Error(err_msg);
     }
 
     /** Get totals */
@@ -37,26 +62,52 @@ exports.new = async function (req) {
 
     code = code + new_cart.id;
 
-    data.products.forEach(element => {
+    data.products.forEach(async (element) => {
       let tmp_quantity = 0;
       for (let index = 0; index < element.sizes.length; index++) {
         const internalElement = element.sizes[index];
         tmp_quantity += internalElement.quantity;
+
+        let quantity = await get_product_quantity(element.productId, internalElement.sizeId);
+        if (quantity > 0) {
+          let rest = quantity - internalElement.quantity;
+
+          await models.ProductSize.update({
+            quantity: rest
+          }, {
+              where: {
+                product_id: element.productId,
+                size_id: internalElement.sizeId
+              }
+            }, transaction);
+          console.log('Reduccion existencia: prod_id -> ' + element.productId + " - size_id -> " + internalElement.sizeId + " - resto -> " + rest);
+        }
       }
 
-      arrProducts.push({ product_id: element.productId, shoppingcart_id: new_cart.id, shop_quantity: tmp_quantity })
+      arrProducts.push({ product_id: element.productId, shoppingcart_id: new_cart.id, shop_quantity: tmp_quantity });
     });
 
     await models.ProductCart.bulkCreate(arrProducts, { transaction });
 
 
-    let new_sale = await models.Sale.create({
+    let pay_generated = await ctr_payments.generate('Confecciones Margarita del Villar', total);
+    let payment_id = null;
+    if (!pay_generated.status) {
+      err_msg = 'Error al generar el pago.';
+      throw new Error(err_msg);
+    } else {
+      payment_id = pay_generated.obj.payment_id;
+    }
+
+    await models.Sale.create({
       rut_retirement: data.rut,
       name_retirement: data.firstName + " " + data.lastName,
       discount: 0,
       final_value: total,
       status: true,
+      payment_status: 0, // 0 Pendiente de pago, 1 Pagada, 2 rechazada
       payment_method_id: 1,
+      payment_id: payment_id,
       code: code,
       delivered: false,
       shoppingcart_id: new_cart.id,
@@ -65,12 +116,18 @@ exports.new = async function (req) {
 
     await transaction.commit();
 
-    return { status: true, msg: 'La venta fue realizada exitosamente', retirement_code: code };
+    return {
+      status: true,
+      msg: 'La venta fue realizada exitosamente',
+      retirement_code: code,
+      payment_id: pay_generated.obj.payment_id,
+      transfer_url: pay_generated.obj.transfer_url
+    };
 
   } catch (err) {
     console.log(err);
     await transaction.rollback();
-    return { status: false, msg: 'La venta no pudo ser realizada exitosamente' };
+    return { status: false, msg: err_msg ? err_msg : 'La venta no pudo ser realizada exitosamente' };
   }
 }
 
@@ -116,5 +173,24 @@ exports.deliver = async (code) => {
     } else {
       return { status: false, msg: 'Hubo un problema al registrar la entega.' }
     }
+  }
+}
+
+exports.confirm_sale = async (data) => {
+  try {
+    let result = await models.Sale.update({
+      payment_status: 1
+    }, {
+        where: {
+          payment_id: data.payment_id
+        }
+      });
+
+    if (result) {
+      return true;
+    }
+  } catch (error) {
+    console.log(error);
+    return false;
   }
 }
