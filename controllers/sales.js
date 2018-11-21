@@ -5,6 +5,26 @@ const models = require('../models');
 const middle_auth = require('../middlewares/auth');
 const ctr_payments = require('../controllers/payments');
 
+async function get_product_quantity(product_id, size_id) {
+  let product = await models.Product.findOne({
+    attributes: ['id', 'status'],
+    where: {
+      id: product_id
+    },
+    include: [{
+      model: models.ProductSize,
+      attributes: ['quantity'],
+      where: {
+        product_id: product_id,
+        size_id: size_id
+      }
+    }],
+    raw: true
+  });
+
+  return product['ProductSizes.quantity'];
+}
+
 exports.new = async (req) => {
   let token = req.headers.authorization;
   let data_token = middle_auth.get_data_token(token);
@@ -42,14 +62,29 @@ exports.new = async (req) => {
 
     code = code + new_cart.id;
 
-    data.products.forEach(element => {
+    data.products.forEach(async (element) => {
       let tmp_quantity = 0;
       for (let index = 0; index < element.sizes.length; index++) {
         const internalElement = element.sizes[index];
         tmp_quantity += internalElement.quantity;
+
+        let quantity = await get_product_quantity(element.productId, internalElement.sizeId);
+        if (quantity > 0) {
+          let rest = quantity - internalElement.quantity;
+
+          await models.ProductSize.update({
+            quantity: rest
+          }, {
+              where: {
+                product_id: element.productId,
+                size_id: internalElement.sizeId
+              }
+            }, transaction);
+          console.log('Reduccion existencia: prod_id -> ' + element.productId + " - size_id -> " + internalElement.sizeId + " - resto -> " + rest);
+        }
       }
 
-      arrProducts.push({ product_id: element.productId, shoppingcart_id: new_cart.id, shop_quantity: tmp_quantity })
+      arrProducts.push({ product_id: element.productId, shoppingcart_id: new_cart.id, shop_quantity: tmp_quantity });
     });
 
     await models.ProductCart.bulkCreate(arrProducts, { transaction });
