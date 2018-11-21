@@ -2,6 +2,8 @@
 
 const models = require('../models');
 var middle_auth = require('../middlewares/auth');
+var bcrypt = require('bcrypt');
+var userDB = require('../models/user');
 
 //Registrar usuario
 exports.register = async function (data, profile_id = 2) {
@@ -17,22 +19,35 @@ exports.register = async function (data, profile_id = 2) {
         profile_id: profile_id //perfil id de cliente por defecto
     };
 
+    var BCRYPT_SALT_ROUNDS = 10;
+
     return new Promise((resolve, reject) => {
-        models.User.findOrCreate({
-            where: {
-                mail: user_data.mail,
-                $or: [
-                    { rut: user_data.rut }
-                ]
-            },
-            defaults: user_data
-        }).spread((user, created) => {
-            if (created == true) {
-                resolve({ status: true, msg: "User creado exitosamente." });
-            } else {
+
+        bcrypt.hash(data.password, BCRYPT_SALT_ROUNDS)
+            .then(function (hashedPassword) {
+                user_data.password = hashedPassword;
+
+                models.User.findOrCreate({
+                    where: {
+                        mail: user_data.mail,
+                        $or: [
+                            { rut: user_data.rut }
+                        ]
+                    },
+                    defaults: user_data
+                }).spread((user, created) => {
+                    if (created == true) {
+                        resolve({ status: true, msg: "User creado exitosamente." });
+                    } else {
+                        resolve({ status: false, msg: "User ya existe en nuestros registros." });
+                    }
+                });
+            })
+            .catch(function (error) {
+                console.log("Error");
+                console.log(error);
                 resolve({ status: false, msg: "User ya existe en nuestros registros." });
-            }
-        });
+            });
     });
 }
 
