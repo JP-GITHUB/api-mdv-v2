@@ -27,7 +27,8 @@ exports.generate = async function (subject, amount) {
     return new Promise((resolve, reject) => {
         khipu.createPayment(payment, function callback(err, payment) {
             if (err) {
-                reject(err);
+                resolve({ status: false, msg: err.message });
+                return;
             }
 
             console.log(payment);
@@ -45,7 +46,9 @@ exports.confirm_sale_with_token = async function (obj) {
 
         khipu.getPaymentByNotificationToken(obj.notification_token, function (err, payment) {
             if (err) {
-                throw err;
+                //throw err;
+                console.log(err);
+                resolve({ status: false});
             }
 
             if (payment.status == "done") {

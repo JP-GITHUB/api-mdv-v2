@@ -15,11 +15,14 @@ exports.new = async (req) => {
   let arrProducts = [];
   let total = 0;
 
+  let err_msg = null;
+
   try {
     transaction = await models.sequelize.transaction();
 
     if (!data.products) {
-      throw new Error('Sin productos para realizar la venta.')
+      err_msg = 'Sin productos para realizar la venta.';
+      throw new Error(err_msg);
     }
 
     /** Get totals */
@@ -55,7 +58,8 @@ exports.new = async (req) => {
     let pay_generated = await ctr_payments.generate('Confecciones Margarita del Villar', total);
     let payment_id = null;
     if (!pay_generated.status) {
-      throw new Error('Error al generar el pago.');
+      err_msg = 'Error al generar el pago.';
+      throw new Error(err_msg);
     } else {
       payment_id = pay_generated.obj.payment_id;
     }
@@ -88,7 +92,7 @@ exports.new = async (req) => {
   } catch (err) {
     console.log(err);
     await transaction.rollback();
-    return { status: false, msg: 'La venta no pudo ser realizada exitosamente' };
+    return { status: false, msg: err_msg ? err_msg : 'La venta no pudo ser realizada exitosamente' };
   }
 }
 
