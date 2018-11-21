@@ -62,33 +62,35 @@ exports.new = async (req) => {
 
     code = code + new_cart.id;
 
-    data.products.forEach(async (element) => {
+    data.products.forEach((element) => {
       let tmp_quantity = 0;
       for (let index = 0; index < element.sizes.length; index++) {
         const internalElement = element.sizes[index];
         tmp_quantity += internalElement.quantity;
 
-        let quantity = await get_product_quantity(element.productId, internalElement.sizeId);
-        if (quantity > 0) {
-          let rest = quantity - internalElement.quantity;
+        get_product_quantity(element.productId, internalElement.sizeId)
+          .then(result_quantity => {
+            if (result_quantity > 0) {
+              let rest = result_quantity - internalElement.quantity;
 
-          await models.ProductSize.update({
-            quantity: rest
-          }, {
-              where: {
-                product_id: element.productId,
-                size_id: internalElement.sizeId
-              }
-            }, transaction);
-          console.log('Reduccion existencia: prod_id -> ' + element.productId + " - size_id -> " + internalElement.sizeId + " - resto -> " + rest);
-        }
+              models.ProductSize.update({
+                quantity: rest
+              }, {
+                  where: {
+                    product_id: element.productId,
+                    size_id: internalElement.sizeId
+                  }
+                }, transaction);
+
+              console.log('Reduccion existencia: prod_id -> ' + element.productId + " - size_id -> " + internalElement.sizeId + " - resto -> " + rest);
+            }
+          });
       }
 
       arrProducts.push({ product_id: element.productId, shoppingcart_id: new_cart.id, shop_quantity: tmp_quantity });
     });
-
+    
     await models.ProductCart.bulkCreate(arrProducts, { transaction });
-
 
     let pay_generated = await ctr_payments.generate('Confecciones Margarita del Villar', total);
     let payment_id = null;
