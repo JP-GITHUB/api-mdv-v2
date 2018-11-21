@@ -73,7 +73,7 @@ exports.get_by_school = async function (school_id) {
 //productos para cargar el dtt
 exports.get_all_dt = async function () {
     let products = await models.Product.findAll({
-        attributes: ['id', 'name', 'description'],
+        attributes: ['id', 'name', 'description', 'status'],
         include:
             [
                 { model: models.School },
