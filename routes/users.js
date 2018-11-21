@@ -2,6 +2,7 @@ var express = require('express');
 var middle_auth = require('../middlewares/auth');
 var router = express.Router();
 
+
 var user_ctr = require('../controllers/users');
 
 const { check, validationResult } = require('express-validator/check');
