@@ -5,7 +5,7 @@ const models = require('../models');
 
 //existencias para cargar el dtt
 exports.get_all_dt = async function () {
-    let existances = await models.Product.findAll({
+    let existances = await models.ProductSize.findAll({
         attributes: ['price', 'quantity', 'product_id', 'size_id'],
         include:
             [
@@ -27,7 +27,7 @@ exports.get_all_dt = async function () {
 //Actualizar existencia.
 exports.update = function (data) {
     return new Promise((resolve, reject) => {
-        models.Product.update({
+        models.ProductSize.update({
             price: data.name,
             quantity: data.description,
              
@@ -47,21 +47,20 @@ exports.update = function (data) {
 
 //Crear existencia.
 exports.new = async function (data) {
-    let product_data = {
-        name: data.name,
-        description: data.description,
-        status: true,
-        school_id: data.school,
-        gender_id: data.gender
+    let existance_data = {
+        price: data.name,
+        quantity: data.description,
+        product_id: data.product_id,
+        size_id: data.size_id,
     };
 
     return new Promise((resolve, reject) => {
-        models.Product.findOrCreate({
+        models.ProductSize.findOrCreate({
             where: {
-                name: data.name,
-                status: true
+                product_id: data.product_id,
+                size_id: data.size_id
             },
-            defaults: product_data
+            defaults: existance_data
         }).spread((name, created) => {
             if (created == true) {
                 resolve({ status: true, msg: "Producto creado." });
@@ -70,40 +69,4 @@ exports.new = async function (data) {
             }
         });
     });
-}
-
-//Eliminar producto.
-exports.delete = async function (product_id) {
-
-    return new Promise((resolve, reject) => {
-        models.Product.update({ status: 0 }, {
-            where: {
-                id: product_id
-            }
-        })
-            .then(function (rowsUpdated) {
-                resolve({ status: true, msg: "Producto Eliminado." })
-            })
-            .catch(function (err) {
-
-                reject({ status: false, msg: "Error al eliminar producto." });
-            });
-    });
-}
-
-exports.getGender = async function () {
-    let gender = await models.Gender.findAll({
-    })
-
-    if (gender === null || gender.length == 0) {
-        return {
-            status: false,
-            msg: 'No hay productos para mostrar.'
-        };
-    }
-
-    return {
-        status: true,
-        obj: gender
-    };
 }
