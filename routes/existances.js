@@ -33,9 +33,4 @@ router.put('/', middle_auth.validate, async function(req, res, next) {
     res.json(await existance_ctr.update(data));
 });
 
-//Eliminar producto.
-router.delete('/:existance_id', middle_auth.validate, async function(req, res, next) {
-    res.json(await existance_ctr.delete(req.params.product_id));
-});
-
 module.exports = router;

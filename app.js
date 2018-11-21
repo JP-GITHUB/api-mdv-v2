@@ -12,6 +12,7 @@ var schoolsRouter = require('./routes/schools');
 var branchOfficeRouter = require('./routes/branch-offices');
 var salesRouter = require('./routes/sales');
 var paymentsRouter = require('./routes/payments');
+var existancesRouter = require('./routes/existances');
 
 /*instanciamos express*/
 var app = express();
@@ -32,5 +33,6 @@ app.use('/schools', schoolsRouter);
 app.use('/branch-offices', branchOfficeRouter);
 app.use('/sales', salesRouter);
 app.use('/payments', paymentsRouter);
+app.use('/existances', existancesRouter);
 
 module.exports = app;
