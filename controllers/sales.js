@@ -135,7 +135,7 @@ exports.new = async (req) => {
 
 exports.get_by_code = (code) => {
   return models.Sale.findOne({
-    attributes: ['name_retirement', 'rut_retirement', 'final_value', 'shoppingcart_id', 'delivered'],
+    attributes: ['name_retirement', 'rut_retirement', 'final_value', 'shoppingcart_id', 'delivered', 'payment_status'],
     where: {
       code: code
     },
