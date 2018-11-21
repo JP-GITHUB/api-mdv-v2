@@ -20,12 +20,19 @@ router.get('/', async function(req, res, next) {
     res.json(await product_ctr.get_by_product_price(req.params.school_id));
 });
 
+//Listar los generos
+router.get('/gender', async function(req, res, next){
+    res.json(await product_ctr.getGender());
+});
+
 //Crear producto.
 router.post('/', middle_auth.validate, [
     check('name').not().isEmpty(),
-    check('description').not().isEmpty().isLength({ min: 4 })
+    check('description').not().isEmpty().isLength({ min: 4 }),
+    check('school').not().isEmpty(),
+    check('gender').not().isEmpty(),
 ], async function(req, res, next) {
-    console.log(req.files)
+    console.log(req.body)
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
