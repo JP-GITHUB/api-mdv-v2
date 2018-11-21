@@ -40,19 +40,6 @@ exports.generate = async function (subject, amount) {
 
 exports.confirm_sale_with_token = async function (obj) {
     return new Promise((resolve, reject) => {
-
-        let tmpData = {
-            "payment_id": 'hksgeq9g3w5j'
-        };
-
-        if (ctr_sale.confirm_sale(tmpData)) {
-            resolve({ status: true });
-        } else {
-            resolve({ status: false });
-        }
-
-        return;
-
         if (!obj.notification_token) {
             resolve({ status: false, msg: 'Sin token de notificación' });
         }
