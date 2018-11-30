@@ -200,7 +200,7 @@ exports.update_quantity = async function (data) {
 }
 
 //Crear producto.
-exports.new = async function (data) {
+exports.new = async function (data, images) {
     let product_data = {
         name: data.name,
         description: data.description,

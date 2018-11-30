@@ -26,19 +26,10 @@ router.get('/gender', async function(req, res, next){
 });
 
 //Crear producto.
-router.post('/', middle_auth.validate, [
-    check('name').not().isEmpty(),
-    check('description').not().isEmpty().isLength({ min: 4 }),
-    check('school').not().isEmpty(),
-    check('gender').not().isEmpty(),
-], async function(req, res, next) {
-    console.log(req.body)
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() });
-    }
+router.post('/', async function(req, res, next) {
     let data = req.body;
-    res.json(await product_ctr.new(data));
+    let images = req.files;
+    res.json(await product_ctr.new(data, images));
 });
 
 //DT
