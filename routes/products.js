@@ -28,8 +28,8 @@ router.get('/gender', async function(req, res, next){
 //Crear producto.
 router.post('/', async function(req, res, next) {
     let data = req.body;
-    let images = req.files;
-    res.json(await product_ctr.new(data, images));
+    let files = req.files;
+    res.json(await product_ctr.new(data, files));
 });
 
 //DT
