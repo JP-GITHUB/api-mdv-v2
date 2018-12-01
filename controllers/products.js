@@ -102,6 +102,8 @@ exports.get_all_dt = async function (req) {
         }
     });
 
+    let count_regs = await models.Product.count();
+
     let products = await models.Product.findAll({
         attributes: ['id', 'name', 'description', 'status'],
         offset: start_pag,
@@ -127,11 +129,10 @@ exports.get_all_dt = async function (req) {
         order: [order_column]
     });
 
-    let count_regs = products.length;
-
+    console.log(count_regs , limit_pag)
     return {
         data: products,
-        draw: 1,
+        draw: (count_regs / limit_pag),
         recordsFiltered: count_regs,
         recordsTotal: count_regs
     };
