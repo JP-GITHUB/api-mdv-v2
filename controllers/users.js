@@ -7,7 +7,6 @@ var userDB = require('../models/user');
 
 //Registrar usuario
 exports.register = async function (data, profile_id = 2) {
-    console.log(data);
     let user_data = {
         name: data.name,
         lastname: data.lastname,

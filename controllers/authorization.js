@@ -13,16 +13,16 @@ exports.login = async function (mail, password) {
             mail: mail
         }
     });
-    
+
     const match = await bcrypt.compare(password, user.password);
-    
-        if (!match) {
-            return { status: false, msg: 'Las credenciales son inválidas' };
-        } else {
-            if (user.estado == false) {
-                return { status: false, msg: 'El usuario se encuentra en estado deshabilitado' };
-            }
+
+    if (!match) {
+        return { status: false, msg: 'Las credenciales son inválidas' };
+    } else {
+        if (user.estado == false) {
+            return { status: false, msg: 'El usuario se encuentra en estado deshabilitado' };
         }
+    }
 
     let tmp_user = {
         id: user.id,
@@ -34,13 +34,14 @@ exports.login = async function (mail, password) {
         profile_id: user.profile_id
     }
 
-
-
     let profile = await models.Profile.findOne({
         include: [{
             model: models.Permission,
             attributes: ['id', 'name']
-        }]
+        }],
+        where: {
+            id: user.profile_id
+        }
     });
 
     let permissions = await profile.Permissions || [];
