@@ -2,6 +2,7 @@
 
 var jwt = require('jsonwebtoken');
 const models = require('../models');
+const DIR_UPLOADS_IMAGES = '/uploads/images/';
 
 //Listar productos
 exports.get_all = async function () {
@@ -71,21 +72,66 @@ exports.get_by_school = async function (school_id) {
 }
 
 //productos para cargar el dtt
-exports.get_all_dt = async function () {
-    let products = await models.Product.findAll({
-        attributes: ['id', 'name', 'description', 'status'],
-        include:
-            [
-                { model: models.School },
-                { model: models.Gender }
-            ]
+exports.get_all_dt = async function (req) {
+    const Op = models.Sequelize.Op;
+    let start_pag = req.body.start;
+    let limit_pag = req.body.length;
+    let search = req.body.search ? req.body.search.value : null;
+
+    let order_column = [];
+    req.body.order.forEach(element => {
+        let filter_column = req.body.columns[element.column].data;
+        switch (filter_column) {
+            case 'id':
+                order_column.push(['id', element.dir]);
+                break;
+            case 'name':
+                order_column.push(['name', element.dir]);
+                break;
+            case 'description':
+                order_column.push(['description', element.dir]);
+                break;
+            case 'School.name':
+                order_column.push([models.School, 'name', element.dir]);
+                break;
+            case 'Gender.description':
+                order_column.push([models.Gender, 'description', element.dir]);
+                break;
+            default:
+                break;
+        }
     });
 
-    let count_regs = products.length;
+    let count_regs = await models.Product.count();
 
+    let products = await models.Product.findAll({
+        attributes: ['id', 'name', 'description', 'status'],
+        offset: start_pag,
+        limit: limit_pag,
+        include: [
+            { model: models.School },
+            { model: models.Gender }
+        ],
+        where: {
+            [Op.or]: [
+                {
+                    name: {
+                        [Op.like]: '%' + search + '%'
+                    }
+                }, {
+                    description: {
+                        [Op.like]: '%' + search + '%'
+                    }
+                }
+
+            ]
+        },
+        order: [order_column]
+    });
+    
     return {
         data: products,
-        draw: 0,
+        draw: (count_regs / limit_pag),
         recordsFiltered: count_regs,
         recordsTotal: count_regs
     };
@@ -200,7 +246,11 @@ exports.update_quantity = async function (data) {
 }
 
 //Crear producto.
-exports.new = async function (data) {
+exports.new = async function (obj, files) {
+    let err_image_uploads = [];
+    let images = null;
+    let data = JSON.parse(obj.data);
+
     let product_data = {
         name: data.name,
         description: data.description,
@@ -209,6 +259,10 @@ exports.new = async function (data) {
         gender_id: data.gender
     };
 
+    if (files != null) {
+        images = files.images;
+    }
+
     return new Promise((resolve, reject) => {
         models.Product.findOrCreate({
             where: {
@@ -216,8 +270,33 @@ exports.new = async function (data) {
                 status: true
             },
             defaults: product_data
-        }).spread((name, created) => {
+        }).spread((product, created) => {
             if (created == true) {
+                /** Despues de crear el producto agregaremos las imagenes que fueron seleccionadas. */
+                if (images instanceof Array) {
+                    images.forEach(element => {
+                        let full_path = DIR_UPLOADS_IMAGES + element.name;
+                        element.mv('.' + full_path, function (err) {
+                            if (err) {
+                                console.log(err);
+                                err_image_uploads.push({ name: element.name, msg: 'Error al subir la imagen', err: err });
+                            }
+
+                            insertProductImage(full_path, product.id);
+                        });
+                    });
+                } else {
+                    let full_path = DIR_UPLOADS_IMAGES + images.name;
+                    images.mv('.' + full_path, function (err) {
+                        if (err) {
+                            console.log(err);
+                            err_image_uploads.push({ name: images.name, msg: 'Error al subir la imagen', err: err });
+                        }
+
+                        insertProductImage(full_path, product.id);
+                    });
+                }
+
                 resolve({ status: true, msg: "Producto creado." });
             } else {
                 reject({ status: false, msg: "El produto ya existe en la base de datos." });
@@ -226,6 +305,24 @@ exports.new = async function (data) {
     });
 }
 
+async function insertProductImage(full_path, product_id) {
+    try {
+        let result = await models.ProductImage.create({
+            location: full_path,
+            status: true,
+            product_id: product_id
+        });
+
+        if (result) {
+            return true;
+        } else {
+            return false;
+        }
+    } catch (err) {
+        console.log(err);
+        return false;
+    }
+}
 //Eliminar producto.
 exports.delete = async function (product_id) {
 

@@ -7,7 +7,6 @@ var userDB = require('../models/user');
 
 //Registrar usuario
 exports.register = async function (data, profile_id = 2) {
-    console.log(data);
     let user_data = {
         name: data.name,
         lastname: data.lastname,
@@ -119,20 +118,54 @@ exports.forgot_password = async function (email) {
 }
 
 
-exports.get_all_dt = async function () {
-    let users = await models.User.findAll({
-        attributes: ['id', 'name', 'lastname'],
-        where: {
-            status: true
-        },
-        raw: true
+exports.get_all_dt = async function (req = null) {
+    const Op = models.Sequelize.Op;
+    let start_pag = req.body.start;
+    let limit_pag = req.body.length;
+    let search = req.body.search ? req.body.search.value : null;
+
+    let order_column = [];
+    req.body.order.forEach(element => {
+        let filter_column = req.body.columns[element.column].data;
+        switch (filter_column) {
+            case 'name':
+                order_column.push(['name', element.dir]);
+                break;
+            case 'lastname':
+                order_column.push(['lastname', element.dir]);
+                break;
+            default:
+                break;
+        }
     });
 
-    let count_regs = users.length;
+    let count_regs = await models.User.count();
+
+    let users = await models.User.findAll({
+        attributes: ['id', 'name', 'lastname'],
+        offset: start_pag,
+        limit: limit_pag,
+        where: {
+            status: true,
+            [Op.or]: [
+                {
+                    name: {
+                        [Op.like]: '%' + search + '%'
+                    }
+                }, {
+                    lastname: {
+                        [Op.like]: '%' + search + '%'
+                    }
+                }
+
+            ]
+        },
+        order: order_column.length > 0 ? [order_column] : null
+    });
 
     return {
         data: users,
-        draw: 0,
+        draw: (count_regs / limit_pag),
         recordsFiltered: count_regs,
         recordsTotal: count_regs
     };
