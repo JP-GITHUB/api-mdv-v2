@@ -72,21 +72,66 @@ exports.get_by_school = async function (school_id) {
 }
 
 //productos para cargar el dtt
-exports.get_all_dt = async function () {
+exports.get_all_dt = async function (req) {
+    const Op = models.Sequelize.Op;
+    let start_pag = req.body.start;
+    let limit_pag = req.body.length;
+    let search = req.body.search ? req.body.search.value : null;
+
+    let order_column = [];
+    req.body.order.forEach(element => {
+        let filter_column = req.body.columns[element.column].data;
+        switch (filter_column) {
+            case 'id':
+                order_column.push(['id', element.dir]);
+                break;
+            case 'name':
+                order_column.push(['id', element.dir]);
+                break;
+            case 'description':
+                order_column.push(['id', element.dir]);
+                break;
+            case 'School.name':
+                order_column.push([models.School, 'name', element.dir]);
+                break;
+            case 'Gender.description':
+                order_column.push([models.Gender, 'id', element.dir]);
+                break;
+            default:
+                break;
+        }
+    });
+
     let products = await models.Product.findAll({
         attributes: ['id', 'name', 'description', 'status'],
-        include:
-            [
-                { model: models.School },
-                { model: models.Gender }
+        offset: start_pag,
+        limit: limit_pag,
+        include: [
+            { model: models.School },
+            { model: models.Gender }
+        ],
+        where: {
+            [Op.or]: [
+                {
+                    name: {
+                        [Op.like]: '%' + search + '%'
+                    }
+                }, {
+                    description: {
+                        [Op.like]: '%' + search + '%'
+                    }
+                }
+
             ]
+        },
+        order: [order_column]
     });
 
     let count_regs = products.length;
 
     return {
         data: products,
-        draw: 0,
+        draw: 1,
         recordsFiltered: count_regs,
         recordsTotal: count_regs
     };

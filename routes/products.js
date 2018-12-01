@@ -34,7 +34,7 @@ router.post('/', async function(req, res, next) {
 
 //DT
 router.post('/datatables', middle_auth.validate, async function (req, res, next) {
-    res.json(await product_ctr.get_all_dt());
+    res.json(await product_ctr.get_all_dt(req));
 });
 
 //Actualizar producto.
