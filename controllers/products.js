@@ -86,16 +86,16 @@ exports.get_all_dt = async function (req) {
                 order_column.push(['id', element.dir]);
                 break;
             case 'name':
-                order_column.push(['id', element.dir]);
+                order_column.push(['name', element.dir]);
                 break;
             case 'description':
-                order_column.push(['id', element.dir]);
+                order_column.push(['description', element.dir]);
                 break;
             case 'School.name':
                 order_column.push([models.School, 'name', element.dir]);
                 break;
             case 'Gender.description':
-                order_column.push([models.Gender, 'id', element.dir]);
+                order_column.push([models.Gender, 'description', element.dir]);
                 break;
             default:
                 break;
@@ -128,8 +128,7 @@ exports.get_all_dt = async function (req) {
         },
         order: [order_column]
     });
-
-    console.log(count_regs , limit_pag)
+    
     return {
         data: products,
         draw: (count_regs / limit_pag),
