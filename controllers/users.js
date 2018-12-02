@@ -3,7 +3,6 @@
 const models = require('../models');
 var middle_auth = require('../middlewares/auth');
 var bcrypt = require('bcrypt');
-var userDB = require('../models/user');
 
 //Registrar usuario
 exports.register = async function (data, profile_id = 2) {
@@ -142,7 +141,10 @@ exports.get_all_dt = async function (req = null) {
     let count_regs = await models.User.count();
 
     let users = await models.User.findAll({
-        attributes: ['id', 'name', 'lastname'],
+        attributes: {
+            include: ['id', 'name', 'lastname', [models.sequelize.col('Profile.id'), 'profile_id'], [models.sequelize.col('Profile.name'), 'profile_name']],
+            exclude: ['rut', 'mail', 'telephone', 'password', 'created_at', 'updated_at']
+        },
         offset: start_pag,
         limit: limit_pag,
         where: {
@@ -160,7 +162,14 @@ exports.get_all_dt = async function (req = null) {
 
             ]
         },
-        order: order_column.length > 0 ? [order_column] : null
+        order: order_column.length > 0 ? [order_column] : null,
+        include: [
+            {
+                model: models.Profile,
+                attributes: []
+            }
+        ],
+        raw: true
     });
 
     return {
