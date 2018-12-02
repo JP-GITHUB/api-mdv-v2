@@ -189,9 +189,20 @@ exports.get_all = async function () {
 //Listar todos los usuarios.
 exports.get_by_id = async function (user_id) {
     return await models.User.findOne({
+        attributes: {
+            include: ['id', 'name', 'lastname', [models.sequelize.col('Profile.id'), 'profile_id'], [models.sequelize.col('Profile.name'), 'profile_name']],
+            exclude: ['password']
+        },
         where: {
             id: user_id
-        }
+        },
+        include: [
+            {
+                model: models.Profile,
+                attributes: []
+            }
+        ],
+        raw: true
     });
 }
 
