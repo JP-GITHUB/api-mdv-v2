@@ -4,11 +4,11 @@ const router = express.Router();
 const middle_auth = require('../middlewares/auth');
 var payment_ctr = require('../controllers/payments');
 
-router.get('/banks', middle_auth.validate, async function (req, res) {
+router.get('/banks',  middle_auth.validate, async function (req, res) {
 	res.json(await payment_ctr.banks());
 });
 
-router.post('/', middle_auth.validate, async function (req, res) {
+router.post('/',  middle_auth.validate, middle_auth.verify_permisson, async function (req, res) {
 	let subject = req.body.subject;
 	let amount = req.body.amount;
 	res.json(await payment_ctr.generate(subject, amount))

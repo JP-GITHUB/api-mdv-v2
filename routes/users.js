@@ -11,8 +11,7 @@ router.get('/:user_id', middle_auth.validate, middle_auth.verify_permisson, asyn
     res.json(await user_ctr.get_by_id(req.params.user_id));
 });
 
-/** Datatables example */
-router.post('/datatables', middle_auth.validate, async function (req, res, next) {
+router.post('/datatables', middle_auth.validate, middle_auth.verify_permisson, async function (req, res, next) {
     res.json(await user_ctr.get_all_dt(req));
 });
 
@@ -51,13 +50,14 @@ router.post('/change_password', middle_auth.validate, async function (req, res) 
     res.json(await user_ctr.change_password(data));
 });
 
+
 /** RestFull */
 
-router.get('/', middle_auth.validate, async function (req, res, next) {
+router.get('/', middle_auth.validate, middle_auth.verify_permisson, async function (req, res, next) {
     res.json(await user_ctr.get_all());
 });
 
-router.post('/', middle_auth.validate, [
+router.post('/', middle_auth.validate, middle_auth.verify_permisson, [
     check('name').not().isEmpty().isLength({ min: 3 }),
     check('mail').not().isEmpty().isEmail(),
     check('lastname').not().isEmpty().isLength({ min: 3 }),
@@ -74,12 +74,13 @@ router.post('/', middle_auth.validate, [
     res.json(await user_ctr.register(data, (profile_id ? profile_id : 2))); // 2 - Comprador
 });
 
-router.put('/', middle_auth.validate, async function (req, res, next) {
+router.put('/', middle_auth.validate, middle_auth.verify_permisson, async function (req, res, next) {
     let data = req.body;
     res.json(await user_ctr.update(data));
 });
 
-router.delete('/:user_id', middle_auth.validate, async function (req, res, next) {
+router.delete('/:user_id', middle_auth.validate, middle_auth.verify_permisson, async function (req, res, next) {
     res.json(await user_ctr.delete(req.params.user_id));
 });
+
 module.exports = router;

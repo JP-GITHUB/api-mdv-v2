@@ -5,7 +5,8 @@ exports.validate = function (req, res, next) {
     var token = req.headers['authorization']
     if (!token) {
         res.status(401).json({
-            error: "Es necesario el token de autenticación"
+            status: false,
+            msg: "Es necesario el token de autenticación"
         });
         return;
     }
@@ -15,7 +16,8 @@ exports.validate = function (req, res, next) {
     jwt.verify(token, 'estoesultrasecreto', function (err, user) {
         if (err) {
             res.status(401).json({
-                error: 'Token inválido'
+                status: false,
+                msg: 'Token inválido'
             });
         }
     })
@@ -27,19 +29,37 @@ exports.verify_permisson = function (req, res, next) {
     var token = req.headers['authorization'];
     token = token.replace('Bearer ', '');
 
+    let current_url = req.originalUrl;
     let data_token = jwt.decode(token, 'estoesultrasecreto');
-    //console.log(data_token);
     let profile_id = data_token.user.profile_id;
 
-    models.Profile.findAll({
+    models.Profile.findOne({
+        attributes: [],
         where: {
             id: profile_id
         },
         include: [{
+            attributes: ['name'],
             model: models.Permission
         }]
     }).then(data => {
-        console.log(data)
+        let permissions = data.Permissions;
+        let status_permission = false;
+
+        permissions.map(permission => {
+            let permission_profile = permission.name;
+            if (current_url.search(permission_profile.toLowerCase()) != -1) {
+                status_permission = true;
+            }
+        });
+
+        if (!status_permission) {
+            res.status(401).json({
+                status: false,
+                msg: 'Sin permisos para la acción'
+            });
+        }
+
     })
     next();
 }

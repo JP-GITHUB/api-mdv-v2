@@ -7,17 +7,17 @@ var profiles_ctr = require('../controllers/profiles');
 const { check, validationResult } = require('express-validator/check');
 
 //Listar perfiles
-router.get('/', middle_auth.validate, /*middle_auth.veryfy_permisson,*/async function (req, res, next) {
+router.get('/', middle_auth.validate, async function (req, res, next) {
 	res.json(await profiles_ctr.get_all());
 });
 
 //Actualizar perfil
-router.put('/', middle_auth.validate, async function (req, res, next) {	
+router.put('/', middle_auth.validate, middle_auth.verify_permisson, async function (req, res, next) {
 	res.json(await profiles_ctr.update(req.body.id, req.body.name));
 });
 
 //Crear nuevo perfil
-router.post('/', middle_auth.validate, [
+router.post('/', middle_auth.validate, middle_auth.verify_permisson, [
 	check('name').not().isEmpty().isLength({ min: 3 }),
 ], async function (req, res, next) {
 	const errors = validationResult(req);
