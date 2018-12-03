@@ -61,7 +61,7 @@ exports.login = async function (mail, password) {
     }
 
     var token = jwt.sign(tokenData, 'estoesultrasecreto', {
-        expiresIn: 60 * 60 * 24 // expires in 24 hours
+        expiresIn: '1h'
     })
 
     return {
