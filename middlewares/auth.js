@@ -28,12 +28,16 @@ exports.verify_permisson = function (req, res, next) {
     token = token.replace('Bearer ', '');
 
     let data_token = jwt.decode(token, 'estoesultrasecreto');
-    let perfil_id = data_token.user.PERFIL.id;
+    //console.log(data_token);
+    let profile_id = data_token.user.profile_id;
 
-    models.PERFIL.findAll({
+    models.Profile.findAll({
         where: {
-            id: perfil_id
-        }
+            id: profile_id
+        },
+        include: [{
+            model: models.Permission
+        }]
     }).then(data => {
         console.log(data)
     })

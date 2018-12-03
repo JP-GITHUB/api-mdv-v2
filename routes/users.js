@@ -7,24 +7,12 @@ var user_ctr = require('../controllers/users');
 
 const { check, validationResult } = require('express-validator/check');
 
-/**
- * Example validation check: 
- * 
-router.get('/:id', [check('id').isLength({ max: 3 })], function (req, res, next) {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() });
-    }
-    res.json(user_ctr.get_by_id(null));
-});
-*/
-
-router.get('/:user_id', middle_auth.validate, async function (req, res) {
+router.get('/:user_id', middle_auth.validate, middle_auth.verify_permisson, async function (req, res) {
     res.json(await user_ctr.get_by_id(req.params.user_id));
 });
 
 /** Datatables example */
-router.post('/datatables',  async function (req, res, next) {
+router.post('/datatables', middle_auth.validate, async function (req, res, next) {
     res.json(await user_ctr.get_all_dt(req));
 });
 
@@ -69,7 +57,7 @@ router.get('/', middle_auth.validate, async function (req, res, next) {
     res.json(await user_ctr.get_all());
 });
 
-router.post('/', [
+router.post('/', middle_auth.validate, [
     check('name').not().isEmpty().isLength({ min: 3 }),
     check('mail').not().isEmpty().isEmail(),
     check('lastname').not().isEmpty().isLength({ min: 3 }),
@@ -82,7 +70,8 @@ router.post('/', [
         return res.status(422).json({ errors: errors.array() });
     }
     let data = req.body;
-    res.json(await user_ctr.register(data, 2)); // 2 = Vendedor
+    let profile_id = data.profile_id;
+    res.json(await user_ctr.register(data, (profile_id ? profile_id : 2))); // 2 - Comprador
 });
 
 router.put('/', middle_auth.validate, async function (req, res, next) {
