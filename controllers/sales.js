@@ -89,7 +89,7 @@ exports.new = async (req) => {
 
       arrProducts.push({ product_id: element.productId, shoppingcart_id: new_cart.id, shop_quantity: tmp_quantity });
     });
-    
+
     await models.ProductCart.bulkCreate(arrProducts, { transaction });
 
     let pay_generated = await ctr_payments.generate('Confecciones Margarita del Villar', total);
@@ -150,6 +150,18 @@ exports.get_by_code = (code) => {
       ]
     }]
   })
+}
+
+exports.get_by_user_email = (email) => {
+  return models.User.findOne({
+    attributes: ['id', 'name', 'lastname'],
+    where: {
+      mail : email
+    },
+    include: [
+      { model: models.Sale }
+    ]
+  });
 }
 
 exports.deliver = async (code) => {

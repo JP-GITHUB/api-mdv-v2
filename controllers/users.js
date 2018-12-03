@@ -3,7 +3,7 @@
 const models = require('../models');
 var middle_auth = require('../middlewares/auth');
 var bcrypt = require('bcrypt');
-var userDB = require('../models/user');
+const BCRYPT_SALT_ROUNDS = 10;
 
 //Registrar usuario
 exports.register = async function (data, profile_id = 2) {
@@ -18,35 +18,30 @@ exports.register = async function (data, profile_id = 2) {
         profile_id: profile_id //perfil id de cliente por defecto
     };
 
-    var BCRYPT_SALT_ROUNDS = 10;
-
     return new Promise((resolve, reject) => {
+        bcrypt.hash(data.password, BCRYPT_SALT_ROUNDS).then(function (hashedPassword) {
+            user_data.password = hashedPassword;
 
-        bcrypt.hash(data.password, BCRYPT_SALT_ROUNDS)
-            .then(function (hashedPassword) {
-                user_data.password = hashedPassword;
-
-                models.User.findOrCreate({
-                    where: {
-                        mail: user_data.mail,
-                        $or: [
-                            { rut: user_data.rut }
-                        ]
-                    },
-                    defaults: user_data
-                }).spread((user, created) => {
-                    if (created == true) {
-                        resolve({ status: true, msg: "User creado exitosamente." });
-                    } else {
-                        resolve({ status: false, msg: "User ya existe en nuestros registros." });
-                    }
-                });
-            })
-            .catch(function (error) {
-                console.log("Error");
-                console.log(error);
-                resolve({ status: false, msg: "User ya existe en nuestros registros." });
+            models.User.findOrCreate({
+                where: {
+                    mail: user_data.mail,
+                    $or: [
+                        { rut: user_data.rut }
+                    ]
+                },
+                defaults: user_data
+            }).spread((user, created) => {
+                if (created == true) {
+                    resolve({ status: true, msg: "User creado exitosamente." });
+                } else {
+                    resolve({ status: false, msg: "User ya existe en nuestros registros." });
+                }
             });
+        }).catch(function (error) {
+            console.log("Error");
+            console.log(error);
+            resolve({ status: false, msg: "User ya existe en nuestros registros." });
+        });
     });
 }
 
@@ -142,7 +137,10 @@ exports.get_all_dt = async function (req = null) {
     let count_regs = await models.User.count();
 
     let users = await models.User.findAll({
-        attributes: ['id', 'name', 'lastname'],
+        attributes: {
+            include: ['id', 'name', 'lastname', [models.sequelize.col('Profile.id'), 'profile_id'], [models.sequelize.col('Profile.name'), 'profile_name']],
+            exclude: ['rut', 'mail', 'telephone', 'password', 'created_at', 'updated_at']
+        },
         offset: start_pag,
         limit: limit_pag,
         where: {
@@ -160,7 +158,14 @@ exports.get_all_dt = async function (req = null) {
 
             ]
         },
-        order: order_column.length > 0 ? [order_column] : null
+        order: order_column.length > 0 ? [order_column] : null,
+        include: [
+            {
+                model: models.Profile,
+                attributes: []
+            }
+        ],
+        raw: true
     });
 
     return {
@@ -180,9 +185,20 @@ exports.get_all = async function () {
 //Listar todos los usuarios.
 exports.get_by_id = async function (user_id) {
     return await models.User.findOne({
+        attributes: {
+            include: ['id', 'name', 'lastname', [models.sequelize.col('Profile.id'), 'profile_id'], [models.sequelize.col('Profile.name'), 'profile_name']],
+            exclude: ['password']
+        },
         where: {
             id: user_id
-        }
+        },
+        include: [
+            {
+                model: models.Profile,
+                attributes: []
+            }
+        ],
+        raw: true
     });
 }
 
@@ -194,23 +210,29 @@ exports.get_user_in_token = function (token) {
 //Actualizar usuario.
 exports.update = async function (data) {
     return new Promise((resolve, reject) => {
-        models.User.update({
-            name: data.name,
-            lastname: data.lastname,
-            rut: data.rut,
-            mail: data.mail,
-            telephone: data.telephone,
-            password: data.password,
-            perfil_id: data.perfil
-        }, {
+        bcrypt.hash(data.password, BCRYPT_SALT_ROUNDS).then(function (hashedPassword) {
+            models.User.update({
+                name: data.name,
+                lastname: data.lastname,
+                rut: data.rut,
+                mail: data.mail,
+                telephone: data.telephone,
+                password: hashedPassword,
+                profile_id: data.profile_id
+            }, {
                 where: {
                     id: data.id
                 }
-            }).then(function (rowsUpdated) {
-                resolve({ status: true, msg: 'Usuario actualizado correctamente' });
-            }).catch(err => {
-                reject({ status: false, msg, err });
-            });
+                }).then(function (rowsUpdated) {
+                    resolve({ status: true, msg: 'Usuario actualizado correctamente' });
+                }).catch(err => {
+                    reject({ status: false, msg, err });
+                });
+        }).catch(function (error) {
+            console.log("Error");
+            console.log(error);
+            resolve({ status: false, msg: "Error al actualizar el usuario." });
+        });
     });
 }
 
