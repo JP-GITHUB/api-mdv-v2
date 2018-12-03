@@ -9,11 +9,10 @@ const { check, validationResult } = require('express-validator/check');
 //Crear existencia.
 router.post('/', middle_auth.validate, [
     check('price').not().isEmpty(),
-    check('quantity').not().isEmpty().isLength({ min: 4 }),
+    check('quantity').not().isEmpty(),
     check('product').not().isEmpty(),
-    check('size').not().isEmpty(),
+    check('size').not().isEmpty()
 ], async function(req, res, next) {
-    console.log(req.body)
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() });
@@ -24,7 +23,7 @@ router.post('/', middle_auth.validate, [
 
 //DT
 router.post('/datatables', middle_auth.validate, async function (req, res, next) {
-    res.json(await existance_ctr.get_all_dt());
+    res.json(await existance_ctr.get_all_dt(req));
 });
 
 //Actualizar producto.
@@ -32,5 +31,9 @@ router.put('/', middle_auth.validate, async function(req, res, next) {
     let data = req.body;
     res.json(await existance_ctr.update(data));
 });
+
+router.get('/sizes', async function(req, res, next){
+    res.json(await existance_ctr.get_sizes());
+})
 
 module.exports = router;
