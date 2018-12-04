@@ -13,6 +13,7 @@ var productsRouter = require('./routes/products');
 var schoolsRouter = require('./routes/schools');
 var branchOfficeRouter = require('./routes/branch-offices');
 var salesRouter = require('./routes/sales');
+var purchasesRouter = require('./routes/purchases');
 var paymentsRouter = require('./routes/payments');
 var existancesRouter = require('./routes/existances');
 
@@ -37,6 +38,7 @@ app.use('/products', productsRouter);
 app.use('/schools', schoolsRouter);
 app.use('/branch-offices', branchOfficeRouter);
 app.use('/sales', salesRouter);
+app.use('/purchases', purchasesRouter);
 app.use('/payments', paymentsRouter);
 app.use('/existances', existancesRouter);
 
