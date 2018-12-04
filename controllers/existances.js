@@ -4,21 +4,48 @@ var jwt = require('jsonwebtoken');
 const models = require('../models');
 
 //existencias para cargar el dtt
-exports.get_all_dt = async function () {
-    let existances = await models.ProductSize.findAll({
-        attributes: ['price', 'quantity', 'product_id', 'size_id'],
-        include:
-            [
-                { model: models.Product },
-                { model: models.Size }
-            ]
+exports.get_all_dt = async function (req) {
+    const Op = models.Sequelize.Op;
+    let start_pag = req.body.start;
+    let limit_pag = req.body.length;
+    let search = req.body.search ? req.body.search.value : null;
+
+    let order_column = [];
+    req.body.order.forEach(element => {
+        let filter_column = req.body.columns[element.column].data;
+        switch (filter_column) {
+            case 'Product.name':
+                order_column.push([models.Product, 'name', element.dir]);
+                break;
+            case 'Size.description':
+                order_column.push([models.Size, 'description', element.dir]);
+                break;            
+            default:
+                break;
+        }
     });
 
-    let count_regs = existances.length;
+    let count_regs = await models.ProductSize.count();
+
+    let existances = await models.ProductSize.findAll({
+        attributes: ['price', 'quantity', 'product_id', 'size_id'],
+        offset: start_pag,
+        limit: limit_pag,
+        include:
+            [
+                { model: models.Product, where: {
+                    name: {
+                        [Op.like]: '%' + search + '%'
+                    }
+                } },
+                { model: models.Size}
+            ],
+            order: [order_column]
+    });
 
     return {
         data: existances,
-        draw: 0,
+        draw: (count_regs / limit_pag),
         recordsFiltered: count_regs,
         recordsTotal: count_regs
     };
@@ -28,13 +55,13 @@ exports.get_all_dt = async function () {
 exports.update = function (data) {
     return new Promise((resolve, reject) => {
         models.ProductSize.update({
-            price: data.name,
-            quantity: data.description,
+            price: data.price,
+            quantity: data.quantity,
              
         }, {
                 where: {
-                    product_id: data.product_id,
-                    size_id: data.size_id
+                    product_id: data.productId,
+                    size_id: data.sizeId
                 }
             }).then(function (rowsUpdated) {
                 resolve({ status: true, msg: 'Producto actualizado correctamente' });
@@ -48,17 +75,17 @@ exports.update = function (data) {
 //Crear existencia.
 exports.new = async function (data) {
     let existance_data = {
-        price: data.name,
-        quantity: data.description,
-        product_id: data.product_id,
-        size_id: data.size_id,
+        price: data.price,
+        quantity: data.quantity,
+        product_id: data.product,
+        size_id: data.size,        
     };
 
     return new Promise((resolve, reject) => {
         models.ProductSize.findOrCreate({
             where: {
-                product_id: data.product_id,
-                size_id: data.size_id
+                product_id: data.product,
+                size_id: data.size
             },
             defaults: existance_data
         }).spread((name, created) => {
@@ -69,4 +96,18 @@ exports.new = async function (data) {
             }
         });
     });
+}
+
+exports.get_sizes = async function () {
+    let sizes = await models.Size.findAll()
+    if (sizes === null || sizes.length == 0) {
+        return {
+            status: false,
+            msg: 'No hay tallas'
+        };
+    }
+    return {
+        status: true,
+        obj: sizes
+    }
 }
