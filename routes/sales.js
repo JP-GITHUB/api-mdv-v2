@@ -22,4 +22,9 @@ router.get('/user_email/:email', middle_auth.validate, middle_auth.verify_permis
 	res.json(await sales_ctr.get_by_user_email(req.params.email));
 });
 
+router.post('/cancel', middle_auth.validate, middle_auth.verify_permisson, async function (req, res) {
+	let sale_id = req.body.sale_id;
+	res.json(await sales_ctr.sale_cancel(sale_id));
+});
+
 module.exports = router;

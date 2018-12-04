@@ -87,7 +87,11 @@ exports.new = async (req) => {
           });
       }
 
-      arrProducts.push({ product_id: element.productId, shoppingcart_id: new_cart.id, shop_quantity: tmp_quantity });
+      arrProducts.push({
+        product_id: element.productId,
+        shoppingcart_id: new_cart.id,
+        shop_quantity: tmp_quantity
+      });
     });
 
     await models.ProductCart.bulkCreate(arrProducts, { transaction });
@@ -156,7 +160,7 @@ exports.get_by_user_email = (email) => {
   return models.User.findOne({
     attributes: ['id', 'name', 'lastname'],
     where: {
-      mail : email
+      mail: email
     },
     include: [
       { model: models.Sale }
@@ -206,5 +210,28 @@ exports.confirm_sale = async (data) => {
   } catch (error) {
     console.log(error);
     return false;
+  }
+}
+
+exports.sale_cancel = async (sale_id) => {
+  try {
+    let update_sale = await models.Sale.update({
+      status: false
+    },
+      {
+        where: {
+          id: sale_id
+        }
+      });
+
+    return {
+      status: true,
+      data: update_sale
+    }
+  } catch (error) {
+    return {
+      status: true,
+      error: error
+    }
   }
 }
